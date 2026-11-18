@@ -1,6 +1,6 @@
 # Supply Chain & Sales Performance Dashboard
 
-A Power BI dashboard built from scratch on a synthetic e-commerce fashion dataset (13 CSV files, ~2.5M rows, Jul 2012 – Dec 2022). Built from a Supply Chain Analyst's point of view: understand the data, agree KPI definitions, validate every number against the source, then design.
+A Power BI dashboard built from scratch on a synthetic e-commerce fashion dataset (13 CSV files, ~2.5M rows, Jul 2012 – Dec 2022). 
 
 **Stack:** Power BI (PBIP/TMDL project format), Power Query, DAX, Python (data profiling)
 
