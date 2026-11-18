@@ -1,0 +1,60 @@
+table WebTraffic
+	lineageTag: 101872be-84aa-4215-a313-8264006fae49
+
+	column date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 9442d1fb-1097-46ff-bb93-d00e820e00e8
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column sessions
+		dataType: int64
+		lineageTag: 4c5a6a92-062f-40b5-9f51-b8c4f0c655bc
+		summarizeBy: sum
+		sourceColumn: sessions
+
+	column unique_visitors
+		dataType: int64
+		lineageTag: 1c56f379-c69a-4a40-abd6-b4bc8c2c594e
+		summarizeBy: sum
+		sourceColumn: unique_visitors
+
+	column page_views
+		dataType: int64
+		lineageTag: c11e959b-c390-4f3a-83d7-c570febfa44a
+		summarizeBy: sum
+		sourceColumn: page_views
+
+	column bounce_rate
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 8c8fec71-1147-49e6-9e21-6abf49122ef2
+		summarizeBy: none
+		sourceColumn: bounce_rate
+
+	column avg_session_duration_sec
+		dataType: double
+		formatString: #,0.0
+		lineageTag: df1d3851-0ffc-4bb1-80e7-6c780b5d7328
+		summarizeBy: none
+		sourceColumn: avg_session_duration_sec
+
+	column traffic_source
+		dataType: string
+		lineageTag: 32a27d66-3aee-4b0f-8810-c410be4bba0b
+		summarizeBy: none
+		sourceColumn: traffic_source
+
+	partition WebTraffic = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\web_traffic.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"date", type date}, {"sessions", Int64.Type}, {"unique_visitors", Int64.Type}, {"page_views", Int64.Type}, {"bounce_rate", type number}, {"avg_session_duration_sec", type number}, {"traffic_source", type text}}, "en-US")
+				in
+					Typed
+

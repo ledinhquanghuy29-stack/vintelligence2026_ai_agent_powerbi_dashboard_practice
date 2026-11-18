@@ -1,0 +1,19 @@
+table 'Overstock Days Threshold'
+	lineageTag: bcf79af2-9e05-4584-bf0b-18170229876e
+
+	measure 'Overstock Days Selected' = SELECTEDVALUE('Overstock Days Threshold'[Overstock Days Threshold], 180)
+		formatString: 0
+		displayFolder: Parameters
+		lineageTag: 83171350-f653-46aa-a0c5-098caefc6485
+
+	column 'Overstock Days Threshold'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7ac42cff-cc90-491d-a5cd-a311e25ae252
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition 'Overstock Days Threshold' = calculated
+		mode: import
+		source = GENERATESERIES(30, 720, 30)
+

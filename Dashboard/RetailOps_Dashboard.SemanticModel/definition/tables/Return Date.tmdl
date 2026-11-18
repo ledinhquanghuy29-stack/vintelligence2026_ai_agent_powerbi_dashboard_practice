@@ -1,0 +1,67 @@
+table 'Return Date'
+	lineageTag: b8c7b8be-8647-4bcb-928e-c7f275443875
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: a27a0526-169c-400c-8380-07b5accdf2b4
+		summarizeBy: none
+		sourceColumn: [Date]
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ce4ef33-9440-4d48-b8f6-4d889e36bf75
+		summarizeBy: none
+		sourceColumn: [Year]
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c0410213-9bf1-4d66-a661-f05f04c2292e
+		summarizeBy: none
+		sourceColumn: [Month Number]
+
+	column Month
+		dataType: string
+		lineageTag: fdc22d97-84ef-45ad-b6b0-7769440a9913
+		summarizeBy: none
+		sourceColumn: [Month]
+		sortByColumn: 'Month Number'
+
+	column Year-Month
+		dataType: string
+		lineageTag: e85f2cf8-50bd-4d01-b165-7e9a7526bf39
+		summarizeBy: none
+		sourceColumn: [Year-Month]
+		sortByColumn: 'Year-Month Sort'
+
+	column 'Year-Month Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8d8c8306-66e4-49b2-b7b0-6785352af0e4
+		summarizeBy: none
+		sourceColumn: [Year-Month Sort]
+
+	column 'Is Partial Year'
+		dataType: string
+		lineageTag: 407c1c6d-5705-4d95-9d7d-e219ca00cac3
+		summarizeBy: none
+		sourceColumn: [Is Partial Year]
+
+	partition 'Return Date' = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS(
+				    'Date',
+				    "Date", 'Date'[Date],
+				    "Year", 'Date'[Year],
+				    "Month Number", 'Date'[Month Number],
+				    "Month", 'Date'[Month],
+				    "Year-Month", 'Date'[Year-Month],
+				    "Year-Month Sort", 'Date'[Year-Month Sort],
+				    "Is Partial Year", 'Date'[Is Partial Year]
+				)
+

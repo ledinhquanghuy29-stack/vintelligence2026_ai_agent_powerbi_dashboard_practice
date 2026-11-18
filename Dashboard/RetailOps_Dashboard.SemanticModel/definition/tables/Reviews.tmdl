@@ -1,0 +1,62 @@
+table Reviews
+	lineageTag: 1434d97d-d12f-42a4-a60c-7968cecea519
+
+	column review_id
+		dataType: string
+		isHidden
+		lineageTag: 72631911-733c-4cae-9fbc-a5f7e0fd36b0
+		summarizeBy: none
+		sourceColumn: review_id
+
+	column order_id
+		dataType: int64
+		isHidden
+		lineageTag: fcd947ff-fde9-4dbe-b9dc-ecc525f6ae7b
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column product_id
+		dataType: int64
+		isHidden
+		lineageTag: 10ff8fb1-1901-488b-a26e-a1d35bc92064
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column customer_id
+		dataType: int64
+		isHidden
+		lineageTag: 836689d3-11c3-4722-9e77-2f64357026a8
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column review_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: da58cb33-b8cc-4e83-a30d-123711b0e0a8
+		summarizeBy: none
+		sourceColumn: review_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column rating
+		dataType: int64
+		lineageTag: cb8a0b55-6510-4dfd-af4e-233f5a9350ab
+		summarizeBy: none
+		sourceColumn: rating
+
+	column review_title
+		dataType: string
+		lineageTag: fe90afa8-e136-4360-9b71-fea3ecacfab0
+		summarizeBy: none
+		sourceColumn: review_title
+
+	partition Reviews = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\reviews.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"review_id", type text}, {"order_id", Int64.Type}, {"product_id", Int64.Type}, {"customer_id", Int64.Type}, {"review_date", type date}, {"rating", Int64.Type}, {"review_title", type text}}, "en-US")
+				in
+					Typed
+

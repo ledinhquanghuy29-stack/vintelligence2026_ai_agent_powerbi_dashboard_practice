@@ -1,0 +1,68 @@
+table Date
+	lineageTag: 114d4aa5-01dc-41b3-93b1-bd4714502e4d
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 67089c5f-d643-463d-8618-a1296cfc3bd3
+		summarizeBy: none
+		sourceColumn: [Date]
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 2174ad71-4a07-40dd-ab23-7394bce9b724
+		summarizeBy: none
+		sourceColumn: [Year]
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 294f1e19-c91b-42db-9032-c58d9b055a19
+		summarizeBy: none
+		sourceColumn: [Month Number]
+
+	column Month
+		dataType: string
+		lineageTag: 66425ecc-7a68-4985-9bb0-15366b26b0c0
+		summarizeBy: none
+		sourceColumn: [Month]
+		sortByColumn: 'Month Number'
+
+	column Year-Month
+		dataType: string
+		lineageTag: 78c98fe3-1ebc-4350-a35f-9a4edfdd47e3
+		summarizeBy: none
+		sourceColumn: [Year-Month]
+		sortByColumn: 'Year-Month Sort'
+
+	column 'Year-Month Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0005c5b4-b666-410c-bdd0-d0100e06aa64
+		summarizeBy: none
+		sourceColumn: [Year-Month Sort]
+
+	column 'Is Partial Year'
+		dataType: string
+		lineageTag: 09a73689-b1b4-4c88-87a2-a44200ee9f9f
+		summarizeBy: none
+		sourceColumn: [Is Partial Year]
+
+	partition Date = calculated
+		mode: import
+		source =
+				ADDCOLUMNS(
+				    CALENDAR(DATE(2012, 1, 1), DATE(2022, 12, 31)),
+				    "Year", YEAR([Date]),
+				    "Month Number", MONTH([Date]),
+				    "Month", FORMAT([Date], "mmm"),
+				    "Year-Month", FORMAT([Date], "yyyy-mm"),
+				    "Year-Month Sort", YEAR([Date]) * 100 + MONTH([Date]),
+				    "Is Partial Year", IF(YEAR([Date]) = 2012, "Partial (Jul-Dec)", "Full")
+				)
+

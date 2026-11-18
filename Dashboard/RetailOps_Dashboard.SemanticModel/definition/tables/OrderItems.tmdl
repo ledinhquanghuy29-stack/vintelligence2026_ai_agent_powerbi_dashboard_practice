@@ -1,0 +1,88 @@
+table OrderItems
+	lineageTag: 1cf03ba7-ddf8-4590-b251-6e6fb4686c7f
+
+	column order_id
+		dataType: int64
+		isHidden
+		lineageTag: 55314012-2351-43a2-a1d3-01d6bfeaf557
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column product_id
+		dataType: int64
+		isHidden
+		lineageTag: 9de114ec-5d4b-47b3-beff-1462ca7c5108
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column quantity
+		dataType: int64
+		formatString: #,0
+		lineageTag: 59b9cad7-9c22-41ce-9aaa-9341ca214ba9
+		summarizeBy: sum
+		sourceColumn: quantity
+
+	column unit_price
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 6835e7a8-665b-4391-9f45-5ab2a2a43e94
+		summarizeBy: none
+		sourceColumn: unit_price
+
+	column discount_amount
+		dataType: double
+		formatString: #,0.00
+		lineageTag: de71d3ea-b2b1-4496-ba1e-fae8cf7aab68
+		summarizeBy: none
+		sourceColumn: discount_amount
+
+	column promo_id
+		dataType: string
+		lineageTag: ccb7fa94-d91c-4909-b8e8-95b2cf9ad3d9
+		summarizeBy: none
+		sourceColumn: promo_id
+
+	column promo_id_2
+		dataType: string
+		lineageTag: 728a4de0-ebd0-48a8-9acd-d8a5696517f5
+		summarizeBy: none
+		sourceColumn: promo_id_2
+
+	column line_gross = OrderItems[quantity] * OrderItems[unit_price]
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 6f73c8ba-d847-4d73-b28e-f196efaf367a
+		summarizeBy: none
+
+	column line_net = OrderItems[line_gross] - OrderItems[discount_amount]
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 175f31be-4623-41d3-9ad8-fcffea7f42aa
+		summarizeBy: none
+
+	column line_cost = OrderItems[quantity] * RELATED(Products[cogs])
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 34f1654f-20cf-44aa-bc34-8e386bdbb816
+		summarizeBy: none
+
+	column has_promo = NOT ISBLANK(OrderItems[promo_id]) || NOT ISBLANK(OrderItems[promo_id_2])
+		dataType: boolean
+		lineageTag: b62baf9a-cf77-495b-bf67-b4b1f699df68
+		summarizeBy: none
+
+	column promo_channel_label = IF(ISBLANK(RELATED(Promotions[promo_channel])), "No Promotion", RELATED(Promotions[promo_channel]))
+		dataType: string
+		lineageTag: a1d9b4e7-6c3f-4e0a-9f52-7e2c8b4d1a6e
+		summarizeBy: none
+
+	partition OrderItems = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\order_items.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"order_id", Int64.Type}, {"product_id", Int64.Type}, {"quantity", Int64.Type}, {"unit_price", type number}, {"discount_amount", type number}, {"promo_id", type text}, {"promo_id_2", type text}}, "en-US")
+				in
+					Typed
+

@@ -1,0 +1,164 @@
+# Dashboard Design & Data Model
+
+Technical reference for the Supply Chain & Sales Performance dashboard: the semantic model, the DAX measures, and the page-by-page design. For findings and business context, see the main [README](../README.md). For the round-by-round build history — bugs found, root causes, and fixes — see [`BUILD_LOG.md`](BUILD_LOG.md).
+
+---
+
+## 1. Data model
+
+Star schema, single-direction relationships (dimension → fact).
+
+```
+Date[Date]            -> Orders[order_date]        (active)
+Date[Date]            -> Inventory[snapshot_date]   (active)
+Date[Date]            -> WebTraffic[date]           (active)
+Return Date[Date]     -> Returns[return_date]       (active)
+Review Date[Date]     -> Reviews[review_date]       (active)
+Geography[zip]        -> Orders[zip]
+Orders[order_id]      -> OrderItems[order_id]
+Orders[order_id]      -> Shipments[order_id]
+Orders[order_id]      -> Returns[order_id]
+Orders[customer_id]   -> Customers[customer_id]
+Orders[order_id]      -> Reviews[order_id]          (inactive — see note)
+Products[product_id]  -> OrderItems / Returns / Inventory / Reviews [product_id]
+Promotions[promo_id]  -> OrderItems[promo_id]        (active)
+Promotions[promo_id]  -> OrderItems[promo_id_2]      (inactive — a table pair allows only one active relationship)
+```
+
+`Orders → Reviews` is inactive because `Reviews` already reaches `Orders` indirectly and keeping both active creates an ambiguous filter path through `OrderItems` (which also relates to both `Orders` and `Products`). `Customers[zip]` is **not** related to `Geography`, since order-level geography already exists via `Orders[zip]` and a second path would be ambiguous too.
+
+### Filter reach
+Not every slicer reaches every page — filters only flow from the "one" side to the "many" side:
+
+| Slicer | Sales | Delivery (Shipments) | Returns | Inventory | Reviews |
+|---|---|---|---|---|---|
+| Year / Month | ✅ (order date) | ✅ (order date) | ✅ (order cohort) | ✅ (snapshot date) | ❌ (own `Review Date`) |
+| Category / Product | ✅ | ❌ | ✅ | ✅ | ✅ |
+| Region (Geography) | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Acquisition Channel | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Promo Channel | ✅ (OrderItems only) | ❌ | ❌ | ❌ | ❌ |
+
+### Data preparation
+- A single Power Query parameter, `DataFolder`, holds the absolute path to `Data/`; every CSV source is built from it.
+- Date columns arrive as text and are cast to `Date` on import.
+- `OrderItems` has 16 duplicate (`order_id`, `product_id`) lines — kept as separate rows, no synthetic line key was added.
+- `products.price` matches `order_items.unit_price` in only ~24% of lines, so revenue is always computed from `unit_price`, never from the catalog price.
+- `inventory` carries its own copies of `product_name`/`category` — hidden; `Products` is the source of truth for those attributes.
+
+---
+
+## 2. Agreed KPI definitions
+
+| Topic | Definition |
+|---|---|
+| Revenue recognition | Only `order_status = "delivered"` |
+| Net Revenue | `Σ(quantity × unit_price) − Σ(discount_amount)` (verified against an independent payments total) |
+| Cost basis | `Σ(quantity × products.cogs)` — a static catalog cost per SKU |
+| Delivery SLA | Lead time (`delivery_date − order_date`) ≤ 7 days |
+| Stockout | `stockout_days ≥ 3` in a product-month |
+| Overstock | `days_of_supply > 180` |
+| Return rate | Units returned ÷ units sold, over `delivered` + `returned` orders |
+| Currency | VND for prices/costs/revenue; USD for `shipping_fee` (different scale, never summed) |
+| Calendar | Standard Jan–Dec year; 2012 is a partial year (Jul–Dec only) |
+
+---
+
+## 3. Calculated columns
+
+| Table | Column | Logic |
+|---|---|---|
+| `OrderItems` | `line_gross` / `line_net` / `line_cost` | Standard revenue/cost line math |
+| `OrderItems` | `has_promo` | `NOT ISBLANK(promo_id) OR NOT ISBLANK(promo_id_2)` |
+| `OrderItems` | `promo_channel_label` | `Promotions[promo_channel]` via `RELATED`, or `"No Promotion"` if unmatched |
+| `Products` | `list_margin` / `list_margin_tier` | `1 − cogs/price`, bucketed into Low/Mid/High terciles |
+| `Shipments` | `lead_days` / `processing_days` / `transit_days` | Date differences vs. the related order |
+| `Returns` | `days_to_return` | `return_date − order_date` |
+| `Customers` | `first_delivered_order_date` | `MIN(Orders[order_date])` filtered to delivered, via relationship context transition |
+| `Inventory` | `is_latest_overstock` | Flags rows at the latest snapshot with `days_of_supply > 180`, used to drive the Inventory page's exception table |
+
+---
+
+## 4. DAX measure catalog
+
+### Sales & Margin
+| Measure | DAX |
+|---|---|
+| Net Revenue | `[Gross Sales] − [Discount Amount]` |
+| Gross Margin % | `DIVIDE([Gross Profit], [Net Revenue])` |
+| AOV | `DIVIDE([Net Revenue], [Order Count])` |
+| Promo Revenue Share % | `DIVIDE([Promo Net Revenue], [Net Revenue])` |
+| Weighted List Margin (validation) | Average `Products[list_margin]` weighted by non-promo revenue — should equal `Gross Margin % (Non-promo)` exactly |
+| Seasonality Index | Average revenue for a calendar month across years, divided by the true grand average (`ALL('Date')`, not a specific-column `ALLSELECTED`, to avoid filter-context bugs) |
+
+### Delivery
+| Measure | DAX |
+|---|---|
+| Avg Lead Time | `CALCULATE(AVERAGE(Shipments[lead_days]), Delivered)` |
+| Delivered Within SLA % | Delivered shipments with `lead_days ≤ [SLA Days]` ÷ all delivered shipments |
+| High-Fee Order Share % | Share of shipped orders with `shipping_fee ≥ 10` |
+
+### Returns
+| Measure | DAX |
+|---|---|
+| Return Rate % | `DIVIDE([Return Units], [Units Received])`, over `delivered` + `returned` orders |
+| Refund % of Net | Refund amount over net revenue of the same order cohort |
+
+### Inventory
+| Measure | DAX |
+|---|---|
+| Ending Stock | `SUM(stock_on_hand)` at the latest snapshot only (semi-additive — never summed across dates) |
+| Stockout / Overstock Rate % | Share of product-months past the agreed threshold (both driven by what-if parameters) |
+| Median Days of Supply | `MEDIAN`, not `AVERAGE` — the max value is 68,100 days, an extreme outlier |
+| Sell-Through % | Volume-weighted: `SUM(units_sold) / (SUM(stock_on_hand) + SUM(units_sold))` |
+
+### Customers & Satisfaction
+| Measure | DAX |
+|---|---|
+| Distinct Customers | Delivered-order customers |
+| Repeat Customer Rate % | Customers with > 1 delivered order ÷ all buying customers |
+| New Customers | Customers whose `first_delivered_order_date` falls inside the current Date filter |
+| Average Rating / Review Count | Straight `AVERAGE`/`COUNTROWS` on `Reviews` |
+
+What-if parameters exposed as slicers: **SLA Days** (default 7), **Stockout Days Threshold** (default 3), **Overstock Days Threshold** (default 180).
+
+---
+
+## 5. Page design
+
+All six pages share one 1,920×1,300 canvas, a shared top-down layout (title → purpose line → slicers → KPI cards → main trend → driver charts → a detail table), and one custom colour theme.
+
+| Page | Main trend | Drivers | Detail |
+|---|---|---|---|
+| **Executive Overview** | Net Revenue by Year (the whole revenue arc in one chart) | Seasonality, days-of-supply trend | Category summary table + Net Revenue by Category donut |
+| **Sales and Margin** | Net Revenue (columns) + Order Count (line) combo chart | Seasonality index, product-mix tier, promo vs. non-promo margin | Category table + margin chart + Net Revenue by Promo Channel |
+| **Delivery and Returns** | SLA % and Return Rate % by month | Order status mix (donut), shipping fee group, return reasons | Orders-by-status table, returns-by-reason table, return units by category |
+| **Inventory** | Ending stock and sell-through by month | Days-of-supply seasonality, receipt-to-sales ratio | Category summary + a filtered, sorted **SKU-level overstock exception list** |
+| **Customers and Satisfaction** | Distinct Customers by Year | Revenue by acquisition channel, rating by category, a compact Web Traffic reference panel | Review summary table + rating distribution donut |
+| **Data Quality and Definitions** | — | — | Reconciliation table (model totals vs. independent benchmarks), known data exceptions, KPI glossary |
+
+### Design principles used throughout
+- **Flat dimensions aren't charted as if they vary.** Lead time, return rate and shipping fee are statistically flat across region/category/year in this dataset — those comparisons were deliberately left out rather than manufacturing a misleading chart.
+- **A table is sized to its content, not stretched to fill the page.** Power BI's table visual doesn't auto-fill unused width; any space freed next to a table holds a paired chart on the same dimension instead of blank canvas.
+- **Chart type matches the question**: donut charts for low-cardinality compositions (≤ 6 categories), a combo chart where two series need to be compared directly, bar/column for everything else.
+- **Every detail table/chart pairing states its date basis** (order date, snapshot date, or review date) in the subtitle, since several tables use different date roles.
+
+---
+
+## 6. Validation (reconciliation)
+
+The model is checked against two independent, pre-aggregated source files (`sales.csv`, `payments.csv`) that were never used to build any measure — every figure below is recomputed from `order_items`/`orders` and must match:
+
+| Check | Expected |
+|---|---|
+| Gross Sales (all statuses) = `sales.csv` Revenue | 16.43B |
+| COGS (all statuses) = `sales.csv` COGS | 14.16B |
+| Net Revenue (all statuses) = `payments.csv` total | 15.68B |
+| Weighted List Margin = Non-promo Gross Margin % | Exact match, every year |
+
+These four checks are reproduced live on the **Data Quality** page.
+
+---
+
+## How this was built
+
+The semantic model (TMDL) and report pages (PBIR JSON) were generated by small Python scripts rather than built by hand in Power BI Desktop — every table, relationship, measure, and visual is plain, reviewable text, and the whole report can be regenerated from the data and the agreed KPI definitions above. Power BI's own loader (relationship cardinality checks, ambiguous-path detection) acted as the validator each time the project was opened.

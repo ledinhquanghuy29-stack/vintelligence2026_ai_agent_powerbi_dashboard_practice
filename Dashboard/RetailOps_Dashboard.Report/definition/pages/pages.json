@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
+  "pageOrder": [
+    "exec_overview",
+    "sales_margin",
+    "delivery_returns",
+    "inventory",
+    "customers_satisfaction",
+    "data_quality"
+  ],
+  "activePageName": "sales_margin"
+}

@@ -1,0 +1,5 @@
+expression DataFolder = "C:\Users\ledin\Documents\Personal Project\Power BI with Ai\Data" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 0c635e73-1b37-4433-8020-cd23cf5708e6
+
+	annotation PBI_ResultType = Text
+

@@ -1,0 +1,188 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "f0656ca134a94631863f",
+  "position": {
+    "x": 20,
+    "y": 96,
+    "z": 8000,
+    "height": 165,
+    "width": 1880,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Gross Sales (All Statuses)"
+                }
+              },
+              "queryRef": "_Measures.Gross Sales (All Statuses)",
+              "nativeQueryRef": "Gross Sales (All Statuses)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "sales.csv Revenue"
+                }
+              },
+              "queryRef": "_Measures.sales.csv Revenue",
+              "nativeQueryRef": "sales.csv Revenue"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Diff Gross Sales vs sales.csv"
+                }
+              },
+              "queryRef": "_Measures.Diff Gross Sales vs sales.csv",
+              "nativeQueryRef": "Diff Gross Sales vs sales.csv"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "COGS (All Statuses)"
+                }
+              },
+              "queryRef": "_Measures.COGS (All Statuses)",
+              "nativeQueryRef": "COGS (All Statuses)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "sales.csv COGS"
+                }
+              },
+              "queryRef": "_Measures.sales.csv COGS",
+              "nativeQueryRef": "sales.csv COGS"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Diff COGS vs sales.csv"
+                }
+              },
+              "queryRef": "_Measures.Diff COGS vs sales.csv",
+              "nativeQueryRef": "Diff COGS vs sales.csv"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Net Revenue (All Statuses)"
+                }
+              },
+              "queryRef": "_Measures.Net Revenue (All Statuses)",
+              "nativeQueryRef": "Net Revenue (All Statuses)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "payments Total"
+                }
+              },
+              "queryRef": "_Measures.payments Total",
+              "nativeQueryRef": "payments Total"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Diff Net vs payments"
+                }
+              },
+              "queryRef": "_Measures.Diff Net vs payments",
+              "nativeQueryRef": "Diff Net vs payments"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Diff Weighted List Margin vs Non-promo Margin"
+                }
+              },
+              "queryRef": "_Measures.Diff Weighted List Margin vs Non-promo Margin",
+              "nativeQueryRef": "Diff Weighted List Margin vs Non-promo Margin"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Reconciliation (Diff columns should be ~0)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

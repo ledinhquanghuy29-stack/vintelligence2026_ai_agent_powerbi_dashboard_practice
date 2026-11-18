@@ -1,0 +1,425 @@
+table _Measures
+	lineageTag: 687dd6df-1bdd-460f-b6ed-a97f77e07a07
+
+	measure 'Gross Sales' = CALCULATE(SUM(OrderItems[line_gross]), Orders[order_status] = "delivered")
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: ccc985f5-84c3-489a-8a46-f09bdcbffd33
+
+	measure 'Discount Amount' = CALCULATE(SUM(OrderItems[discount_amount]), Orders[order_status] = "delivered")
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: 286452b5-8e45-49b9-b002-08fe04dcdb12
+
+	measure 'Net Revenue' = [Gross Sales] - [Discount Amount]
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: d39d5245-609a-4e88-841e-98468095bf79
+
+	measure 'Discount Rate' = DIVIDE([Discount Amount], [Gross Sales])
+		formatString: 0.00%
+		displayFolder: Sales
+		lineageTag: f609eb6c-ec71-4b9b-97f5-73d82d5fae20
+
+	measure 'Units Sold' = CALCULATE(SUM(OrderItems[quantity]), Orders[order_status] = "delivered")
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: a8a9f1e9-03dc-4a15-9a15-a0ebfec00f77
+
+	measure 'Order Count' = CALCULATE(DISTINCTCOUNT(OrderItems[order_id]), Orders[order_status] = "delivered")
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: b366f157-6564-4cfb-8c73-81d3dfbcd1b7
+
+	measure AOV = DIVIDE([Net Revenue], [Order Count])
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: 1ae8dcba-0534-480a-b801-d9dde13abc41
+
+	measure COGS = CALCULATE(SUM(OrderItems[line_cost]), Orders[order_status] = "delivered")
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: a4a1847f-f9aa-46b0-8d4f-f36532e186c9
+
+	measure 'Gross Profit' = [Net Revenue] - [COGS]
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: cb6e77c9-5173-48b0-a169-8ea439cd364f
+
+	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Net Revenue])
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: e9c99c65-130a-483a-bc8a-cdb03e3ff78b
+
+	measure 'Net Revenue PY' = CALCULATE([Net Revenue], SAMEPERIODLASTYEAR('Date'[Date]))
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: 1f11e49c-d5a5-4470-8c31-f221bc8bea43
+
+	measure 'Net Revenue YoY %' =
+			VAR y = MAX('Date'[Year])
+			RETURN IF(y <= 2013, BLANK(), DIVIDE([Net Revenue] - [Net Revenue PY], [Net Revenue PY]))
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 469858b2-1119-4387-8cea-fcd5335c60ab
+
+	measure 'Revenue Share %' = DIVIDE([Net Revenue], CALCULATE([Net Revenue], REMOVEFILTERS(Products)))
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 4be30a34-39e6-48fd-8558-00c7c36408a8
+
+	measure 'Promo Net Revenue' = CALCULATE([Net Revenue], OrderItems[has_promo] = TRUE())
+		formatString: #,0 "VND"
+		displayFolder: Sales
+		lineageTag: 8af988cb-e505-49bc-b5a9-9fb09f758ea9
+
+	measure 'Promo Revenue Share %' = DIVIDE([Promo Net Revenue], [Net Revenue])
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 7a59424b-915e-4083-a833-3f34003a9ec8
+
+	measure 'Gross Margin % (Promo)' = CALCULATE([Gross Margin %], OrderItems[has_promo] = TRUE())
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: d09d35c3-e1b0-47dc-9651-875494d81a63
+
+	measure 'Gross Margin % (Non-promo)' = CALCULATE([Gross Margin %], OrderItems[has_promo] = FALSE())
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: f9927ca8-3c43-4193-8668-0349d91383be
+
+	measure 'Weighted List Margin (Non-promo)' =
+			CALCULATE(
+			    DIVIDE(SUMX(OrderItems, OrderItems[line_net] * RELATED(Products[list_margin])), SUM(OrderItems[line_net])),
+			    OrderItems[has_promo] = FALSE(),
+			    Orders[order_status] = "delivered"
+			)
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: f091782f-ae4a-4a50-bf58-a71c942ee74e
+
+	measure 'Seasonality Index' =
+			VAR MonthAvg = AVERAGEX(VALUES('Date'[Year]), [Net Revenue])
+			VAR OverallAvg = CALCULATE(AVERAGEX(SUMMARIZE('Date', 'Date'[Year], 'Date'[Month Number]), [Net Revenue]), ALL('Date'))
+			RETURN DIVIDE(MonthAvg, OverallAvg)
+		formatString: 0.00
+		displayFolder: Sales
+		lineageTag: e0d3b55b-1608-47c5-b81d-5bc8ac9756d1
+
+	measure 'Product Cum Revenue %' =
+			VAR cur = [Net Revenue]
+			VAR tot = CALCULATE([Net Revenue], ALLSELECTED(Products[product_id]))
+			RETURN IF(NOT ISBLANK(cur), DIVIDE(SUMX(FILTER(ALLSELECTED(Products[product_id]), [Net Revenue] >= cur), [Net Revenue]), tot))
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: f2c48b73-8f56-4435-8177-23413a239c86
+
+	measure 'Delivered Orders' = CALCULATE(DISTINCTCOUNT(Orders[order_id]), Orders[order_status] = "delivered")
+		formatString: #,0
+		displayFolder: Delivery
+		lineageTag: b4968241-9d1c-495d-86ee-d467ddd0e021
+
+	measure 'Delivered Shipments' = CALCULATE(COUNTROWS(Shipments), Orders[order_status] = "delivered")
+		formatString: #,0
+		displayFolder: Delivery
+		lineageTag: 0c65aa94-5218-4161-9058-766640f7390f
+
+	measure 'Delivered Without Shipment' = [Delivered Orders] - [Delivered Shipments]
+		formatString: #,0
+		displayFolder: Delivery
+		lineageTag: 338c5ed4-9627-4801-8f82-a6e77b950dd0
+
+	measure 'Avg Lead Time' = CALCULATE(AVERAGE(Shipments[lead_days]), Orders[order_status] = "delivered")
+		formatString: 0.00
+		displayFolder: Delivery
+		lineageTag: f0d2afaa-56ab-4489-9555-a8bc93b3a554
+
+	measure 'Avg Processing Time' = CALCULATE(AVERAGE(Shipments[processing_days]), Orders[order_status] = "delivered")
+		formatString: 0.00
+		displayFolder: Delivery
+		lineageTag: a5f670ae-ec66-46f3-a66b-686893e5bc57
+
+	measure 'Avg Transit Time' = CALCULATE(AVERAGE(Shipments[transit_days]), Orders[order_status] = "delivered")
+		formatString: 0.00
+		displayFolder: Delivery
+		lineageTag: 7f1dd5fa-46e6-461e-ad54-cd40b97075c6
+
+	measure 'Delivered Within SLA' =
+			VAR sla = [SLA Days Selected]
+			RETURN CALCULATE(COUNTROWS(Shipments), Shipments[lead_days] <= sla, Orders[order_status] = "delivered")
+		formatString: #,0
+		displayFolder: Delivery
+		lineageTag: d8386f3b-3969-4208-8627-bb6a07bdc9ae
+
+	measure 'Orders Outside SLA' = [Delivered Shipments] - [Delivered Within SLA]
+		formatString: #,0
+		displayFolder: Delivery
+		lineageTag: 6022cf26-6711-4816-9225-0bdfbe5bbe46
+
+	measure 'Delivered Within SLA %' = DIVIDE([Delivered Within SLA], [Delivered Shipments])
+		formatString: 0.00%
+		displayFolder: Delivery
+		lineageTag: cff0d49a-5e17-4e8f-950a-8c3784eb26a2
+
+	measure 'Order Count (All Statuses)' = DISTINCTCOUNT(OrderItems[order_id])
+		formatString: #,0
+		displayFolder: Delivery
+		lineageTag: 87d3174a-bbf2-4ae7-8656-98e58225af97
+
+	measure 'Order Status Mix %' = DIVIDE([Order Count (All Statuses)], CALCULATE([Order Count (All Statuses)], REMOVEFILTERS(Orders[order_status])))
+		formatString: 0.0%
+		displayFolder: Delivery
+		lineageTag: 5c3c5264-2d83-40a7-8e12-ec76cbc45697
+
+	measure 'Avg Shipping Fee' = AVERAGE(Shipments[shipping_fee])
+		formatString: $#,0.00
+		displayFolder: Delivery
+		lineageTag: 410d5120-f541-4914-94b6-42cf2947ba72
+
+	measure 'Median Shipping Fee' = MEDIAN(Shipments[shipping_fee])
+		formatString: $#,0.00
+		displayFolder: Delivery
+		lineageTag: 9311b31a-b9c6-47d5-9cbc-df5bba15ec8d
+
+	measure 'High-Fee Order Share %' =
+			DIVIDE(
+			    CALCULATE(DISTINCTCOUNT(Orders[order_id]), Orders[fee_group] = "High fee"),
+			    CALCULATE(DISTINCTCOUNT(Orders[order_id]), Orders[fee_group] <> "No shipment")
+			)
+		formatString: 0.0%
+		displayFolder: Delivery
+		lineageTag: 4c983932-90f5-46d8-80d1-cabe4ac757ee
+
+	measure 'Units Received' = CALCULATE(SUM(OrderItems[quantity]), Orders[order_status] IN {"delivered", "returned"})
+		formatString: #,0
+		displayFolder: Returns
+		lineageTag: d7fed97e-f7d8-4c2e-b4b4-b5a1aaf28457
+
+	measure 'Return Units' = CALCULATE(SUM(Returns[return_quantity]), Orders[order_status] IN {"delivered", "returned"})
+		formatString: #,0
+		displayFolder: Returns
+		lineageTag: 7fbea84e-77ca-4e60-bcee-248cfcd38414
+
+	measure 'Return Rate %' = DIVIDE([Return Units], [Units Received])
+		formatString: 0.00%
+		displayFolder: Returns
+		lineageTag: 9a608152-960e-4ce8-9308-2e341c530039
+
+	measure 'Refund Amount' = SUM(Returns[refund_amount])
+		formatString: #,0 "VND"
+		displayFolder: Returns
+		lineageTag: d7f55948-011c-4c6a-b5ca-9200605e392c
+
+	measure 'Refund % of Net' = DIVIDE([Refund Amount], CALCULATE(SUM(OrderItems[line_net]), Orders[order_status] IN {"delivered", "returned"}))
+		formatString: 0.00%
+		displayFolder: Returns
+		lineageTag: 51c00e4d-7bd9-4b94-8d4c-997962885fd6
+
+	measure 'Returned Orders' = DISTINCTCOUNT(Returns[order_id])
+		formatString: #,0
+		displayFolder: Returns
+		lineageTag: 912c5aa4-24ae-4dab-87e5-dfbafe96aece
+
+	measure 'Avg Days to Return' = AVERAGE(Returns[days_to_return])
+		formatString: 0.0
+		displayFolder: Returns
+		lineageTag: f2f3f829-2eec-477c-a050-ad197161d802
+
+	measure 'Selected Snapshot' = MAX(Inventory[snapshot_date])
+		formatString: yyyy-mm-dd
+		displayFolder: Inventory
+		lineageTag: e331e400-24fd-459e-8964-15705d5320cf
+
+	measure 'Ending Stock' =
+			VAR d = MAX(Inventory[snapshot_date])
+			RETURN CALCULATE(SUM(Inventory[stock_on_hand]), Inventory[snapshot_date] = d)
+		formatString: #,0
+		displayFolder: Inventory
+		lineageTag: 167083b2-0522-472f-a2e4-83d71b925d1a
+
+	measure 'Stockout Rate %' =
+			VAR t = [Stockout Days Selected]
+			RETURN DIVIDE(CALCULATE(COUNTROWS(Inventory), Inventory[stockout_days] >= t), COUNTROWS(Inventory))
+		formatString: 0.00%
+		displayFolder: Inventory
+		lineageTag: da502cdd-55f7-4bb5-ae6d-6be45c5dc483
+
+	measure 'Overstock Rate %' =
+			VAR t = [Overstock Days Selected]
+			RETURN DIVIDE(CALCULATE(COUNTROWS(Inventory), Inventory[days_of_supply] > t), COUNTROWS(Inventory))
+		formatString: 0.0%
+		displayFolder: Inventory
+		lineageTag: 1d746627-fb6b-4c81-be43-733dfa749ee4
+
+	measure 'Median Days of Supply' = MEDIAN(Inventory[days_of_supply])
+		formatString: #,0
+		displayFolder: Inventory
+		lineageTag: cb299c3b-55c9-4180-b5b1-e43ebfe3bb52
+
+	measure 'Avg Fill Rate' = AVERAGE(Inventory[fill_rate])
+		formatString: 0.0%
+		displayFolder: Inventory
+		lineageTag: 1c275272-8f8d-49dd-87f0-9c891cdbc878
+
+	measure 'Avg Stockout Days' = AVERAGE(Inventory[stockout_days])
+		formatString: 0.00
+		displayFolder: Inventory
+		lineageTag: 8176cb33-61b1-4bdb-8290-722a060ffd9e
+
+	measure 'Sell-Through %' = DIVIDE(SUM(Inventory[units_sold]), SUM(Inventory[stock_on_hand]) + SUM(Inventory[units_sold]))
+		formatString: 0.0%
+		displayFolder: Inventory
+		lineageTag: 188edd2b-d18e-4f15-8f99-28d79f8f9896
+
+	measure 'Avg Sell-Through (row average)' = AVERAGE(Inventory[sell_through_rate])
+		formatString: 0.0%
+		displayFolder: Inventory
+		lineageTag: 0b141e99-425b-46dc-9ccb-bb5c0a23a6cc
+
+	measure 'Receipt-to-Sales Ratio' = DIVIDE(SUM(Inventory[units_received]), SUM(Inventory[units_sold]))
+		formatString: 0.00
+		displayFolder: Inventory
+		lineageTag: 1bbee14a-d94b-4fa6-95b3-6057efc3bece
+
+	measure 'Overstocked Products' =
+			VAR d = MAX(Inventory[snapshot_date])
+			VAR t = [Overstock Days Selected]
+			RETURN CALCULATE(DISTINCTCOUNT(Inventory[product_id]), Inventory[snapshot_date] = d, Inventory[days_of_supply] > t)
+		formatString: #,0
+		displayFolder: Inventory
+		lineageTag: 5b370782-9344-49ad-96c3-a04fdbd30982
+
+	measure 'Gross Sales (All Statuses)' = CALCULATE(SUM(OrderItems[line_gross]), REMOVEFILTERS(Orders[order_status]))
+		formatString: #,0 "VND"
+		displayFolder: Validation
+		lineageTag: ead96138-1520-4071-a91f-ad4cca2d99a5
+
+	measure 'sales.csv Revenue' = SUM(sales[Revenue])
+		formatString: #,0 "VND"
+		displayFolder: Validation
+		lineageTag: 9591efd2-1bac-4e1e-86c1-f9012d3caa6e
+
+	measure 'Diff Gross Sales vs sales.csv' = [Gross Sales (All Statuses)] - [sales.csv Revenue]
+		formatString: #,0.00 "VND"
+		displayFolder: Validation
+		lineageTag: c6170cb5-0312-4bf9-8e05-97de603b821f
+
+	measure 'COGS (All Statuses)' = CALCULATE(SUM(OrderItems[line_cost]), REMOVEFILTERS(Orders[order_status]))
+		formatString: #,0 "VND"
+		displayFolder: Validation
+		lineageTag: 6e9fb4dc-d44f-4a78-b7ca-315cc0114694
+
+	measure 'sales.csv COGS' = SUM(sales[COGS])
+		formatString: #,0 "VND"
+		displayFolder: Validation
+		lineageTag: 5b0c8020-7967-43a1-9b00-dd40c8c0c678
+
+	measure 'Diff COGS vs sales.csv' = [COGS (All Statuses)] - [sales.csv COGS]
+		formatString: #,0.00 "VND"
+		displayFolder: Validation
+		lineageTag: cfd5841b-3fa8-4d28-a966-005d6741a169
+
+	measure 'Net Revenue (All Statuses)' = CALCULATE(SUM(OrderItems[line_net]), REMOVEFILTERS(Orders[order_status]))
+		formatString: #,0 "VND"
+		displayFolder: Validation
+		lineageTag: c96ca4e7-adb3-4c34-9e8c-84d964f389ad
+
+	measure 'payments Total' = SUM(payments[payment_value])
+		formatString: #,0 "VND"
+		displayFolder: Validation
+		lineageTag: 6e67c5f2-c458-4a92-9c0e-e4b1bb823183
+
+	measure 'Diff Net vs payments' = [Net Revenue (All Statuses)] - [payments Total]
+		formatString: #,0.00 "VND"
+		displayFolder: Validation
+		lineageTag: 11c6afe7-fe64-43c3-adea-7883d2fd9a03
+
+	measure 'Diff Weighted List Margin vs Non-promo Margin' = [Weighted List Margin (Non-promo)] - [Gross Margin % (Non-promo)]
+		formatString: 0.0000%
+		displayFolder: Validation
+		lineageTag: fb83ea7c-0403-420b-91fd-80851221fb35
+
+	measure 'Distinct Customers' = CALCULATE(DISTINCTCOUNT(Orders[customer_id]), Orders[order_status] = "delivered")
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 041bb742-618a-4605-b120-8c17ead7a4d5
+
+	measure 'Revenue per Customer' = DIVIDE([Net Revenue], [Distinct Customers])
+		formatString: #,0 "VND"
+		displayFolder: Customers
+		lineageTag: 610da671-2a19-42f9-82c9-b548eed7a61a
+
+	measure 'New Customers' =
+			VAR d1 = MIN('Date'[Date])
+			VAR d2 = MAX('Date'[Date])
+			RETURN CALCULATE(DISTINCTCOUNT(Customers[customer_id]), Customers[first_delivered_order_date] >= d1, Customers[first_delivered_order_date] <= d2)
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 0175e8ac-65e7-4986-b091-7b50b7401548
+
+	measure 'Repeat Customers' =
+			CALCULATE(
+			    DISTINCTCOUNT(Orders[customer_id]),
+			    Orders[order_status] = "delivered",
+			    FILTER(VALUES(Orders[customer_id]), CALCULATE(DISTINCTCOUNT(Orders[order_id]), Orders[order_status] = "delivered") > 1)
+			)
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 81cfa214-fb69-4415-ac79-45b1b894107d
+
+	measure 'Repeat Customer Rate %' = DIVIDE([Repeat Customers], [Distinct Customers])
+		formatString: 0.0%
+		displayFolder: Customers
+		lineageTag: c0bfae7d-a402-4f11-94ee-a2f3c7a2abde
+
+	measure 'Average Rating' = AVERAGE(Reviews[rating])
+		formatString: 0.00
+		displayFolder: Reviews
+		lineageTag: e7f48aa7-afd9-45be-bf88-caf18a468f41
+
+	measure 'Review Count' = COUNTROWS(Reviews)
+		formatString: #,0
+		displayFolder: Reviews
+		lineageTag: 02d58215-740d-40b4-8c86-53ee3703b865
+
+	measure 'Positive Review %' = DIVIDE(CALCULATE(COUNTROWS(Reviews), Reviews[rating] >= 4), [Review Count])
+		formatString: 0.0%
+		displayFolder: Reviews
+		lineageTag: 1ff5e304-fc8a-44fe-9d3c-0a7bcf6b9286
+
+	measure 'Negative Review %' = DIVIDE(CALCULATE(COUNTROWS(Reviews), Reviews[rating] <= 2), [Review Count])
+		formatString: 0.0%
+		displayFolder: Reviews
+		lineageTag: 3b54a0f7-a216-4f8a-acda-046526c6c99b
+
+	measure 'Total Sessions' = SUM(WebTraffic[sessions])
+		formatString: #,0
+		displayFolder: Web Traffic
+		lineageTag: 76b54480-815b-4b3a-a717-d5fadad237ce
+
+	measure 'Total Page Views' = SUM(WebTraffic[page_views])
+		formatString: #,0
+		displayFolder: Web Traffic
+		lineageTag: eae932ca-2074-4511-8feb-54bf0841b8dc
+
+	measure 'Total Unique Visitors (Daily Sum)' = SUM(WebTraffic[unique_visitors])
+		formatString: #,0
+		displayFolder: Web Traffic
+		lineageTag: 30bf7933-0390-450d-9039-afd59a98e8fc
+
+	measure 'Avg Bounce Rate' = AVERAGE(WebTraffic[bounce_rate])
+		formatString: 0.00%
+		displayFolder: Web Traffic
+		lineageTag: 391257bc-3dae-4855-b6db-a7c92b698f29
+
+	column Dummy
+		dataType: int64
+		isHidden
+		lineageTag: fe55ecea-4d83-4faf-8bb8-f21d49b9527f
+		summarizeBy: none
+		sourceColumn: Dummy
+
+	partition _Measures = m
+		mode: import
+		source = #table(type table [Dummy = Int64.Type], {})
+

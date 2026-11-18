@@ -1,0 +1,37 @@
+table sales
+	isHidden
+	lineageTag: 8218d929-646d-40f9-83ab-93f0cfc05191
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 3982064c-2eaf-438b-9cd0-5e5bfbefaedf
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Revenue
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 8b12aed4-73ee-4c8d-942a-c36964ec685b
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+	column COGS
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 1ce5964a-239e-4599-b53d-07050f40a1e1
+		summarizeBy: sum
+		sourceColumn: COGS
+
+	partition sales = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\sales.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"Revenue", type number}, {"COGS", type number}}, "en-US")
+				in
+					Typed
+

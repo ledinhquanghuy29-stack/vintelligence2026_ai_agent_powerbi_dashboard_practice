@@ -1,0 +1,267 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1144.6463469739581,
+            "y": 490.33301948178291
+          },
+          "nodeIndex": "_Measures",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 485.10529156483057,
+            "y": 928.98369721631457
+          },
+          "nodeIndex": "Date",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 910.64634697395809,
+            "y": 674.07439560089585
+          },
+          "nodeIndex": "Geography",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 89.9589598452834,
+            "y": 930.66603896356582
+          },
+          "nodeIndex": "Inventory",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 336.75820632254846,
+            "y": 576.92411976929043
+          },
+          "nodeIndex": "OrderItems",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 623.568745395994,
+            "y": 460.24485879526992
+          },
+          "nodeIndex": "Orders",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1428.6463469739581,
+            "y": 528.33301948178291
+          },
+          "nodeIndex": "Overstock Days Threshold",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1712.6463469739581,
+            "y": 552.33301948178291
+          },
+          "nodeIndex": "payments",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 576.92026296337622
+          },
+          "nodeIndex": "Products",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 549.66002588424863,
+            "y": 0
+          },
+          "nodeIndex": "Return Date",
+          "nodeLineageTag": "b8c7b8be-8647-4bcb-928e-c7f275443875",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 325.36468255961881,
+            "y": 251.35493208563844
+          },
+          "nodeIndex": "Returns",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1996.6463469739581,
+            "y": 564.33301948178291
+          },
+          "nodeIndex": "sales",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 910.62761631099988,
+            "y": 289.66460468441721
+          },
+          "nodeIndex": "Shipments",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2280.6463469739583,
+            "y": 528.33301948178291
+          },
+          "nodeIndex": "SLA Days",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2564.6463469739583,
+            "y": 528.33301948178291
+          },
+          "nodeIndex": "Stockout Days Threshold",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3396.6069826498265,
+            "y": 470.38550524729192
+          },
+          "nodeIndex": "Customers",
+          "nodeLineageTag": "d19b336e-c507-4a55-ad55-3c7490133da8",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3132.6463469739583,
+            "y": 472.33301948178291
+          },
+          "nodeIndex": "Review Date",
+          "nodeLineageTag": "22d201f0-da7a-460e-9fb5-0de362bd41fc",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2848.6463469739583,
+            "y": 472.33301948178291
+          },
+          "nodeIndex": "Reviews",
+          "nodeLineageTag": "1434d97d-d12f-42a4-a60c-7968cecea519",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3650.6463469739583,
+            "y": 522.33301948178291
+          },
+          "nodeIndex": "WebTraffic",
+          "nodeLineageTag": "101872be-84aa-4215-a313-8264006fae49",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3884.6463469739583,
+            "y": 490.33301948178291
+          },
+          "nodeIndex": "Promotions",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 40.0525547248832,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

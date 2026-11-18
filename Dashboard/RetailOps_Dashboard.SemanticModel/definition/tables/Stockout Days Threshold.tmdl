@@ -1,0 +1,19 @@
+table 'Stockout Days Threshold'
+	lineageTag: 196e772d-db9d-4151-b897-f5cbd45baf4e
+
+	measure 'Stockout Days Selected' = SELECTEDVALUE('Stockout Days Threshold'[Stockout Days Threshold], 3)
+		formatString: 0
+		displayFolder: Parameters
+		lineageTag: 72aa0b9c-83b9-4f6f-abab-85fe9bc9c640
+
+	column 'Stockout Days Threshold'
+		dataType: int64
+		formatString: 0
+		lineageTag: e60e5c02-9800-416b-8a50-1ea4a18e5e67
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition 'Stockout Days Threshold' = calculated
+		mode: import
+		source = GENERATESERIES(1, 10, 1)
+

@@ -1,0 +1,63 @@
+table Shipments
+	lineageTag: 994b76b0-aa63-4295-a573-577f31dc1c55
+
+	column order_id
+		dataType: int64
+		isHidden
+		lineageTag: 549a045c-fd43-4bb4-b8d5-064c4be7d810
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column ship_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 485a3e2c-ee7c-451b-a694-889d90178259
+		summarizeBy: none
+		sourceColumn: ship_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column delivery_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: e5b7c23b-8f47-40c3-b49f-d6ea91c34c9c
+		summarizeBy: none
+		sourceColumn: delivery_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column shipping_fee
+		dataType: double
+		formatString: $#,0.00
+		lineageTag: 9ca13c07-4cc6-4ae0-a513-72c863759a77
+		summarizeBy: none
+		sourceColumn: shipping_fee
+
+	column lead_days = DATEDIFF(RELATED(Orders[order_date]), Shipments[delivery_date], DAY)
+		dataType: int64
+		formatString: 0
+		lineageTag: 82c1364a-0287-43d5-91cc-90ac612d7d5f
+		summarizeBy: none
+
+	column processing_days = DATEDIFF(RELATED(Orders[order_date]), Shipments[ship_date], DAY)
+		dataType: int64
+		formatString: 0
+		lineageTag: 5fa8cf88-c354-4037-9698-59e342df9ad6
+		summarizeBy: none
+
+	column transit_days = DATEDIFF(Shipments[ship_date], Shipments[delivery_date], DAY)
+		dataType: int64
+		formatString: 0
+		lineageTag: 0bfa6ec6-edd3-4663-9826-28052632e8aa
+		summarizeBy: none
+
+	partition Shipments = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\shipments.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"order_id", Int64.Type}, {"ship_date", type date}, {"delivery_date", type date}, {"shipping_fee", type number}}, "en-US")
+				in
+					Typed
+

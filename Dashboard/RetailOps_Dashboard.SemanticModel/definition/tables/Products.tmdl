@@ -1,0 +1,78 @@
+table Products
+	lineageTag: 11f71d5e-7b84-49c0-a858-659537a65711
+
+	column product_id
+		dataType: int64
+		isHidden
+		lineageTag: d830c7d4-c0d4-458d-b112-0ef8f9ee7768
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column product_name
+		dataType: string
+		lineageTag: 2618ceea-830c-4169-8fa7-55299db9ec49
+		summarizeBy: none
+		sourceColumn: product_name
+
+	column category
+		dataType: string
+		lineageTag: 5cd0454b-9b8a-4552-8e0f-92d27be489d9
+		summarizeBy: none
+		sourceColumn: category
+
+	column segment
+		dataType: string
+		lineageTag: dbe2d437-1e9c-423f-a20e-c0215f1a6879
+		summarizeBy: none
+		sourceColumn: segment
+
+	column size
+		dataType: string
+		lineageTag: cea89f46-89e5-4a4b-bdeb-e8e0fd8923b2
+		summarizeBy: none
+		sourceColumn: size
+
+	column color
+		dataType: string
+		lineageTag: a88c4fa6-8514-47c8-998b-30aad4c378f3
+		summarizeBy: none
+		sourceColumn: color
+
+	column price
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 235958c5-d2df-42b0-bc27-d2d39ee73763
+		summarizeBy: none
+		sourceColumn: price
+
+	column cogs
+		dataType: double
+		formatString: #,0.00
+		lineageTag: c3632cff-d0a8-4eed-89b4-917e5a1c35c3
+		summarizeBy: none
+		sourceColumn: cogs
+
+	column list_margin = 1 - DIVIDE(Products[cogs], Products[price])
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 1822f73c-3115-4db2-b927-cea3dc9c5fd7
+		summarizeBy: none
+
+	column list_margin_tier =
+			VAR p1 = PERCENTILE.INC(Products[list_margin], 1/3)
+			VAR p2 = PERCENTILE.INC(Products[list_margin], 2/3)
+			RETURN IF(Products[list_margin] <= p1, "Low", IF(Products[list_margin] <= p2, "Mid", "High"))
+		dataType: string
+		lineageTag: 95bc7b52-274f-4900-b62e-c85fc871f8fd
+		summarizeBy: none
+
+	partition Products = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\products.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"product_id", Int64.Type}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"size", type text}, {"color", type text}, {"price", type number}, {"cogs", type number}}, "en-US")
+				in
+					Typed
+

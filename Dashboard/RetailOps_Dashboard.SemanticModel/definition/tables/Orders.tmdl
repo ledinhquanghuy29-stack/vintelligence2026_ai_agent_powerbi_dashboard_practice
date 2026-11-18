@@ -1,0 +1,74 @@
+table Orders
+	lineageTag: b02447e5-3325-4e1d-b02d-a8f419f29a44
+
+	column order_id
+		dataType: int64
+		isHidden
+		lineageTag: 70641566-37f2-489b-912d-f7416bf1941e
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column order_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 251fc870-c76a-41c6-bffd-d6d253fa1c08
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column customer_id
+		dataType: int64
+		isHidden
+		lineageTag: e525c2e8-c66f-4f95-ad6b-590aae8e3aaf
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column zip
+		dataType: int64
+		isHidden
+		lineageTag: 0547cc16-9b4e-4f2c-a755-7007176d92f9
+		summarizeBy: none
+		sourceColumn: zip
+
+	column order_status
+		dataType: string
+		lineageTag: 88960c74-2623-465b-91d2-2204f2490134
+		summarizeBy: none
+		sourceColumn: order_status
+
+	column payment_method
+		dataType: string
+		lineageTag: 117dd757-905a-4058-9d3d-590b7cb7923b
+		summarizeBy: none
+		sourceColumn: payment_method
+
+	column device_type
+		dataType: string
+		lineageTag: d53e6e0d-d47d-45e2-be21-112e4d36cbb2
+		summarizeBy: none
+		sourceColumn: device_type
+
+	column order_source
+		dataType: string
+		lineageTag: 21c9392c-41f4-471f-8ef9-79e57ecacf40
+		summarizeBy: none
+		sourceColumn: order_source
+
+	column fee_group =
+			VAR f = MAXX(RELATEDTABLE(Shipments), Shipments[shipping_fee])
+			RETURN IF(ISBLANK(f), "No shipment", IF(f >= 10, "High fee", "Standard"))
+		dataType: string
+		lineageTag: d9790e8c-ae0d-4eb5-a654-08d75fa49e04
+		summarizeBy: none
+
+	partition Orders = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\orders.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"order_id", Int64.Type}, {"order_date", type date}, {"customer_id", Int64.Type}, {"zip", Int64.Type}, {"order_status", type text}, {"payment_method", type text}, {"device_type", type text}, {"order_source", type text}}, "en-US")
+				in
+					Typed
+

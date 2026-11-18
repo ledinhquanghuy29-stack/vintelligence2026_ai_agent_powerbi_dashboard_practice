@@ -1,0 +1,82 @@
+table Promotions
+	lineageTag: d14d34ba-d981-415b-8bcc-314dc70e0dfa
+
+	column promo_id
+		dataType: string
+		isHidden
+		lineageTag: 32bf0985-9de9-4214-9803-1e4b3f7e3e52
+		summarizeBy: none
+		sourceColumn: promo_id
+
+	column promo_name
+		dataType: string
+		lineageTag: d4cbead9-ee94-4df8-ba1c-3b5f41fafbaa
+		summarizeBy: none
+		sourceColumn: promo_name
+
+	column promo_type
+		dataType: string
+		lineageTag: 761a3d35-ff9c-47e8-9003-5f1866cdb1cb
+		summarizeBy: none
+		sourceColumn: promo_type
+
+	column discount_value
+		dataType: double
+		formatString: 0.0
+		lineageTag: 6a1bd52b-a485-48da-b2ac-6644e572baf8
+		summarizeBy: none
+		sourceColumn: discount_value
+
+	column start_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 2bbb09f5-07dd-43c4-acc4-bec4e0be565a
+		summarizeBy: none
+		sourceColumn: start_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column end_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 98690161-6f28-4549-98b8-27359935932c
+		summarizeBy: none
+		sourceColumn: end_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column applicable_category
+		dataType: string
+		lineageTag: 0321e5c0-63ff-4776-a9ef-a1572534f311
+		summarizeBy: none
+		sourceColumn: applicable_category
+
+	column promo_channel
+		dataType: string
+		lineageTag: 02302b30-da6a-4d51-8e54-54f40627dae3
+		summarizeBy: none
+		sourceColumn: promo_channel
+
+	column stackable_flag
+		dataType: int64
+		lineageTag: 1053caff-1a07-4737-811c-2541f5e0399c
+		summarizeBy: none
+		sourceColumn: stackable_flag
+
+	column min_order_value
+		dataType: int64
+		formatString: #,0
+		lineageTag: e36d8fea-0248-405f-ac1b-ae4281dcd691
+		summarizeBy: none
+		sourceColumn: min_order_value
+
+	partition Promotions = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\promotions.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"promo_id", type text}, {"promo_name", type text}, {"promo_type", type text}, {"discount_value", type number}, {"start_date", type date}, {"end_date", type date}, {"applicable_category", type text}, {"promo_channel", type text}, {"stackable_flag", Int64.Type}, {"min_order_value", Int64.Type}}, "en-US")
+				in
+					Typed
+

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "b9b2c578ef664fd2bd74",
+  "position": {
+    "x": 1698,
+    "y": 562,
+    "z": 14000,
+    "height": 219,
+    "width": 200,
+    "tabOrder": 14000
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Bounce Rate"
+                }
+              },
+              "queryRef": "_Measures.Avg Bounce Rate",
+              "nativeQueryRef": "Avg Bounce Rate"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "ba1e9d38c8cf435dab04",
+  "position": {
+    "x": 20,
+    "y": 50,
+    "z": 5000,
+    "height": 32,
+    "width": 1880,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Reconciliation checks and KPI definitions for this model. No slicers: these are whole-dataset checks. Data: Jul 2012 - Dec 2022 (2012 is a partial year, Jul-Dec only).",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "fontWeight": "normal"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

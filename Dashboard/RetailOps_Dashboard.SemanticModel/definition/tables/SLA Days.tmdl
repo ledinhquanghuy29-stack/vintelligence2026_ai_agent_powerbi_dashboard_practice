@@ -1,0 +1,19 @@
+table 'SLA Days'
+	lineageTag: 4f0be803-a284-47c5-980d-9572de3729ac
+
+	measure 'SLA Days Selected' = SELECTEDVALUE('SLA Days'[SLA Days], 7)
+		formatString: 0
+		displayFolder: Parameters
+		lineageTag: 04308b2c-22c5-47fa-8e6f-67c22636a771
+
+	column 'SLA Days'
+		dataType: int64
+		formatString: 0
+		lineageTag: c8c30637-6a22-483b-9702-3fabfe6aee7e
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition 'SLA Days' = calculated
+		mode: import
+		source = GENERATESERIES(1, 15, 1)
+

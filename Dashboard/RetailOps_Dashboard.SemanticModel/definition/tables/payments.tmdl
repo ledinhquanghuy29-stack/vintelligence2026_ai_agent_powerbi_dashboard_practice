@@ -1,0 +1,40 @@
+table payments
+	isHidden
+	lineageTag: f4930ae8-fbca-4287-b2ee-7c1b62b09777
+
+	column order_id
+		dataType: int64
+		isHidden
+		lineageTag: 91aa5042-b456-4122-8abe-a3baa5d17a02
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column payment_method
+		dataType: string
+		lineageTag: 184679bc-223a-4804-8e1d-fa2b5d0102a6
+		summarizeBy: none
+		sourceColumn: payment_method
+
+	column payment_value
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 1bcd3d6e-502d-4e52-b3c6-42390b7e48a1
+		summarizeBy: sum
+		sourceColumn: payment_value
+
+	column installments
+		dataType: int64
+		lineageTag: dfcc9699-2cba-43d6-a779-ce74c778168f
+		summarizeBy: none
+		sourceColumn: installments
+
+	partition payments = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\payments.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"order_id", Int64.Type}, {"payment_method", type text}, {"payment_value", type number}, {"installments", Int64.Type}}, "en-US")
+				in
+					Typed
+

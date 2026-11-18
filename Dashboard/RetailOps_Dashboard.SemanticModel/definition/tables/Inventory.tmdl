@@ -1,0 +1,139 @@
+table Inventory
+	lineageTag: aa15a369-2b75-4c5e-a2f5-bae6269f8ce8
+
+	column snapshot_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: cdb64303-207b-438c-8372-5dec0b059add
+		summarizeBy: none
+		sourceColumn: snapshot_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column product_id
+		dataType: int64
+		isHidden
+		lineageTag: de177a09-d420-4a3d-aed5-c8822b5ad266
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column stock_on_hand
+		dataType: int64
+		formatString: #,0
+		lineageTag: 05a4f20b-c31f-4762-8139-4bf9c0754806
+		summarizeBy: sum
+		sourceColumn: stock_on_hand
+
+	column units_received
+		dataType: int64
+		formatString: #,0
+		lineageTag: 955645de-2b2f-4f38-86b4-05d3a7775568
+		summarizeBy: sum
+		sourceColumn: units_received
+
+	column units_sold
+		dataType: int64
+		formatString: #,0
+		lineageTag: 48e26d3e-95f1-4cdf-ad9a-20e4727e7ad7
+		summarizeBy: sum
+		sourceColumn: units_sold
+
+	column stockout_days
+		dataType: int64
+		lineageTag: 64b0e607-1b51-4104-98bc-d4833c86d699
+		summarizeBy: none
+		sourceColumn: stockout_days
+
+	column days_of_supply
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 2816b637-22c4-41e8-b2f2-8a839be40791
+		summarizeBy: none
+		sourceColumn: days_of_supply
+
+	column fill_rate
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 5d9ec38b-de9e-4c9d-8213-67e85480d69f
+		summarizeBy: none
+		sourceColumn: fill_rate
+
+	column stockout_flag
+		dataType: int64
+		isHidden
+		lineageTag: 6eedd81d-272e-41a1-9ddf-a59a92a6d30f
+		summarizeBy: none
+		sourceColumn: stockout_flag
+
+	column overstock_flag
+		dataType: int64
+		isHidden
+		lineageTag: 586f0af6-399a-48cc-b998-00a2d55aa150
+		summarizeBy: none
+		sourceColumn: overstock_flag
+
+	column reorder_flag
+		dataType: int64
+		isHidden
+		lineageTag: 7edeba09-a7b4-467f-86a1-2e2a418aa58c
+		summarizeBy: none
+		sourceColumn: reorder_flag
+
+	column sell_through_rate
+		dataType: double
+		formatString: 0.0%
+		lineageTag: b4aa03ef-4e7b-454c-8e6a-ef0e43941ca8
+		summarizeBy: none
+		sourceColumn: sell_through_rate
+
+	column product_name
+		dataType: string
+		isHidden
+		lineageTag: b8516b86-9c61-496e-ba06-b4885f83bc0d
+		summarizeBy: none
+		sourceColumn: product_name
+
+	column category
+		dataType: string
+		isHidden
+		lineageTag: a3049ff2-58df-4191-86f7-e18eeed122f5
+		summarizeBy: none
+		sourceColumn: category
+
+	column segment
+		dataType: string
+		isHidden
+		lineageTag: 9815fada-0053-4689-b660-3ca7f480123f
+		summarizeBy: none
+		sourceColumn: segment
+
+	column year
+		dataType: int64
+		isHidden
+		lineageTag: b8c346e6-a0c9-4c0a-9922-5d398c9b7848
+		summarizeBy: none
+		sourceColumn: year
+
+	column month
+		dataType: int64
+		isHidden
+		lineageTag: c71f497f-2d09-4007-9e07-ce6ed64ef66f
+		summarizeBy: none
+		sourceColumn: month
+
+	column is_latest_overstock = IF(Inventory[snapshot_date] = DATE(2022, 12, 31) && Inventory[days_of_supply] > 180, 1, 0)
+		dataType: int64
+		isHidden
+		lineageTag: 3c9f7a1e-5b82-4d6f-9e4a-1c8b5f2e7a93
+		summarizeBy: none
+
+	partition Inventory = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\inventory.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"snapshot_date", type date}, {"product_id", Int64.Type}, {"stock_on_hand", Int64.Type}, {"units_received", Int64.Type}, {"units_sold", Int64.Type}, {"stockout_days", Int64.Type}, {"days_of_supply", type number}, {"fill_rate", type number}, {"stockout_flag", Int64.Type}, {"overstock_flag", Int64.Type}, {"reorder_flag", Int64.Type}, {"sell_through_rate", type number}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"year", Int64.Type}, {"month", Int64.Type}}, "en-US")
+				in
+					Typed
+

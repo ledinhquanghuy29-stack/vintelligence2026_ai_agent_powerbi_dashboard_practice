@@ -1,0 +1,68 @@
+table Customers
+	lineageTag: d19b336e-c507-4a55-ad55-3c7490133da8
+
+	column customer_id
+		dataType: int64
+		isHidden
+		lineageTag: d4ecad0f-6c90-42ce-8a29-882bde197696
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column zip
+		dataType: int64
+		isHidden
+		lineageTag: 3ba65b44-f1c9-4d80-81ac-0930892eb42c
+		summarizeBy: none
+		sourceColumn: zip
+
+	column city
+		dataType: string
+		isHidden
+		lineageTag: 27ccb21e-81a5-4655-825a-284f3ee1a367
+		summarizeBy: none
+		sourceColumn: city
+
+	column signup_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 70741b6f-e16f-487a-8194-fc89f86b484c
+		summarizeBy: none
+		sourceColumn: signup_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column gender
+		dataType: string
+		lineageTag: c588a9f5-51f0-421c-9b78-1f66ba195330
+		summarizeBy: none
+		sourceColumn: gender
+
+	column age_group
+		dataType: string
+		lineageTag: f46ede43-be6a-4112-8183-0a89fbabda38
+		summarizeBy: none
+		sourceColumn: age_group
+
+	column acquisition_channel
+		dataType: string
+		lineageTag: 0fbabbcc-fb6d-455b-b392-489c16c49373
+		summarizeBy: none
+		sourceColumn: acquisition_channel
+
+	column first_delivered_order_date = CALCULATE(MIN(Orders[order_date]), Orders[order_status] = "delivered")
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: dbd8d86a-56c8-4fe8-b25c-433a4bcf6cb4
+		summarizeBy: none
+
+	partition Customers = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\customers.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"customer_id", Int64.Type}, {"zip", Int64.Type}, {"city", type text}, {"signup_date", type date}, {"gender", type text}, {"age_group", type text}, {"acquisition_channel", type text}}, "en-US")
+				in
+					Typed
+

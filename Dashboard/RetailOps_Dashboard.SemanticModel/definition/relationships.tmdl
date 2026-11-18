@@ -1,0 +1,70 @@
+relationship bf85dd31-36b3-421c-a015-b9a0d3fee242
+	fromColumn: Orders.order_date
+	toColumn: Date.Date
+
+relationship ec729fea-7881-49fe-abd0-76cec02b38a5
+	fromColumn: Inventory.snapshot_date
+	toColumn: Date.Date
+
+relationship 1e1176c6-bd59-49ab-9dc2-10d24319a309
+	fromColumn: Returns.return_date
+	toColumn: 'Return Date'.Date
+
+relationship 63eb6115-0dc2-43a0-be3b-7d766147f83b
+	fromColumn: Orders.zip
+	toColumn: Geography.zip
+
+relationship edfa3ddb-28b7-4939-9087-1b1f48a51138
+	fromColumn: OrderItems.order_id
+	toColumn: Orders.order_id
+
+relationship ecdf1f3c-9c70-4219-be3d-c002cad38fde
+	fromColumn: Shipments.order_id
+	toColumn: Orders.order_id
+
+relationship d5e36e62-4aae-4baa-aa55-dd6cb2f98974
+	fromColumn: Returns.order_id
+	toColumn: Orders.order_id
+
+relationship 7b26268a-f934-4dc2-862c-db546b6712b6
+	fromColumn: OrderItems.product_id
+	toColumn: Products.product_id
+
+relationship 1e822693-4084-4c71-9076-666214ab8fde
+	fromColumn: Returns.product_id
+	toColumn: Products.product_id
+
+relationship b4e4a5f3-bb0e-4211-b5bd-9c9f9ad8e81e
+	fromColumn: Inventory.product_id
+	toColumn: Products.product_id
+
+relationship 1554cbdc-f9c7-496c-a088-a24522cf8079
+	fromColumn: Orders.customer_id
+	toColumn: Customers.customer_id
+
+relationship dc6ca8fd-902c-4bd3-8d46-eca6314b7d88
+	isActive: false
+	fromColumn: Reviews.order_id
+	toColumn: Orders.order_id
+
+relationship 3f4d055d-a4f0-46da-bf25-5f8526bf6ba7
+	fromColumn: Reviews.product_id
+	toColumn: Products.product_id
+
+relationship 221d82d1-45e9-497a-a06b-455ed845f67e
+	fromColumn: WebTraffic.date
+	toColumn: Date.Date
+
+relationship 408eeaf2-bd33-41b3-a35a-be03bd848027
+	fromColumn: Reviews.review_date
+	toColumn: 'Review Date'.Date
+
+relationship a78e887a-cd32-41a4-9df4-fd59825f05cb
+	fromColumn: OrderItems.promo_id
+	toColumn: Promotions.promo_id
+
+relationship eaa36abc-8656-40c0-bcd1-677b26d63ff6
+	isActive: false
+	fromColumn: OrderItems.promo_id_2
+	toColumn: Promotions.promo_id
+

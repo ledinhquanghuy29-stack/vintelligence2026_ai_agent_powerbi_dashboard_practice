@@ -1,0 +1,38 @@
+table Geography
+	lineageTag: 2c88d7e6-3cbb-496e-8dd8-89768fb6eb04
+
+	column zip
+		dataType: int64
+		isHidden
+		lineageTag: b3ed451c-927f-4f5e-8058-1dd5c9f774ec
+		summarizeBy: none
+		sourceColumn: zip
+
+	column city
+		dataType: string
+		lineageTag: dc02bbad-e334-493f-a125-1614e2afc1e1
+		summarizeBy: none
+		sourceColumn: city
+
+	column region
+		dataType: string
+		lineageTag: e6f32efe-dbe6-4c46-9c52-096004a8bc71
+		summarizeBy: none
+		sourceColumn: region
+
+	column district
+		dataType: string
+		lineageTag: c33081ef-263e-402f-91f9-fde7e68cea81
+		summarizeBy: none
+		sourceColumn: district
+
+	partition Geography = m
+		mode: import
+		source =
+				let
+					Source = Csv.Document(File.Contents(DataFolder & "\geography.csv"), [Delimiter=",", Encoding=65001]),
+					Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					Typed = Table.TransformColumnTypes(Promoted, {{"zip", Int64.Type}, {"city", type text}, {"region", type text}, {"district", type text}}, "en-US")
+				in
+					Typed
+
