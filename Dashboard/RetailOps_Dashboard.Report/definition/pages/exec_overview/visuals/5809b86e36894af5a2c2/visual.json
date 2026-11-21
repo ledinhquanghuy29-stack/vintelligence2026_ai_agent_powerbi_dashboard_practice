@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "5809b86e36894af5a2c2",
+  "position": {
+    "x": 20,
+    "y": 42,
+    "z": 3000,
+    "height": 32,
+    "width": 1880,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "One-screen supply chain and sales health check. Slicers filter by Order Date (Year, Month). Data: Jul 2012 - Dec 2022 (2012 is a partial year, Jul-Dec only).",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "fontWeight": "normal"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

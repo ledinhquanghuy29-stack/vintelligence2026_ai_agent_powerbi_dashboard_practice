@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "61dca89d80e449ba9372",
+  "position": {
+    "x": 20,
+    "y": 42,
+    "z": 7000,
+    "height": 32,
+    "width": 1880,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Revenue trend, seasonality, product mix, promotions and promo-channel effect on gross margin. Dates are Order Date. Data: Jul 2012 - Dec 2022 (2012 is a partial year, Jul-Dec only).",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "fontWeight": "normal"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,19 +1,19 @@
 {
   "name": "SupplyChainTheme",
   "dataColors": [
-    "#2E5EAA",
-    "#16A085",
-    "#F39C12",
-    "#E74C3C",
-    "#8E44AD",
-    "#27AE60",
-    "#D35400",
-    "#2C3E50"
+    "#1E5AA8",
+    "#2BA7A0",
+    "#F2A93B",
+    "#6C7A92",
+    "#8B5FBF",
+    "#4C9F70",
+    "#D8674F",
+    "#2F3B52"
   ],
   "background": "#FFFFFF",
-  "foreground": "#1F2937",
-  "tableAccent": "#2E5EAA",
-  "good": "#27AE60",
-  "bad": "#E74C3C",
-  "neutral": "#F39C12"
+  "foreground": "#1F2A3C",
+  "tableAccent": "#1E5AA8",
+  "good": "#3FA66D",
+  "bad": "#DC4C3C",
+  "neutral": "#F2A93B"
 }

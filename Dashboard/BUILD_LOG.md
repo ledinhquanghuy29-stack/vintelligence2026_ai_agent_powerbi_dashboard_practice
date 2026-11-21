@@ -73,6 +73,19 @@ Asked to move the "Site Traffic" reference panel back onto the Customers page, b
 
 ---
 
+## Round 10 — recolouring the report and rebuilding the Data Quality page
+
+Two asks: make the report-wide colour palette nicer, and clean up the Data Quality page, which was still a plain reconciliation table plus three stacked paragraphs of text with no visual hierarchy.
+
+**Colour palette.** Because no chart in this build sets its own `dataPoint` colour overrides, every chart inherits its series colours from `SupplyChainTheme.json` in series order — so the whole report could be recoloured by editing one file. The old 8-colour set mixed fully-saturated hues (pure red, pure orange, pure green) that fought each other for attention. Replaced with a set of similar lightness/saturation (a cohesive blue → teal → amber → slate → purple → sage → terracotta → navy progression), plus softened `good`/`bad`/`neutral` semantic colours to match. No chart JSON needed to change for this.
+
+**Data Quality page.** Added two new, additive-only helpers in the generator (`panel()` for colour-coded text cards with a background/border, and a `RECON_TABLE_STYLE` object for the table) rather than changing the existing `textbox()`/`table()` signatures used by the other five pages, to keep this change isolated:
+- The reconciliation table now has a solid-colour header band, white header text, and banded row shading, instead of default plain styling.
+- The six exception facts that used to be buried inside one dense paragraph are now six individual number chips (big bold number + short caption), coloured amber as a consistent "caution" accent — scannable at a glance instead of requiring the paragraph to be read end to end.
+- The three remaining text blocks became three colour-coded cards side by side (KPI Definitions in blue, Known Limitations in slate — pulled up from the README since it belongs next to the other caveats on this page, Recent Fixes in green), each with its own tinted background and matching border instead of being plain black text with no boundary.
+
+All of this reuses `background`/`border`/`columnHeaders`/`values`/`grid` visual object properties, which are the same category of best-effort-but-long-documented Power BI formatting properties already used for table styling in earlier rounds — not a new kind of risk, just more of it on one page.
+
 ## General lessons from this build
 
 - **Confirm Power BI Desktop is closed before editing project files on disk.** Desktop holds its own in-memory copy and will overwrite external edits when it next saves.

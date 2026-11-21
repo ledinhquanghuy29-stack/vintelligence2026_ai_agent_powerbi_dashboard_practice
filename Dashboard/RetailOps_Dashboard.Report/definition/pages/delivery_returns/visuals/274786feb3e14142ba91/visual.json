@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "274786feb3e14142ba91",
+  "position": {
+    "x": 20,
+    "y": 42,
+    "z": 1000,
+    "height": 32,
+    "width": 1880,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Fulfilment speed against the agreed SLA, together with returns and refunds on the same orders. No promised delivery date exists in the data. Data: Jul 2012 - Dec 2022 (2012 is a partial year, Jul-Dec only).",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "fontWeight": "normal"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

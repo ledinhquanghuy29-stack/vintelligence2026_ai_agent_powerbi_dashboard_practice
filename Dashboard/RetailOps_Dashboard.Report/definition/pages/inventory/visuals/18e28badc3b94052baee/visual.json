@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "18e28badc3b94052baee",
+  "position": {
+    "x": 980,
+    "y": 80,
+    "z": 1000,
+    "height": 54,
+    "width": 220,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Overstock Days Threshold"
+                    }
+                  },
+                  "Property": "Overstock Days Threshold"
+                }
+              },
+              "queryRef": "Overstock Days Threshold.Overstock Days Threshold",
+              "nativeQueryRef": "Overstock Days Threshold",
+              "active": true
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
