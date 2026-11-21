@@ -19,10 +19,9 @@
               {
                 "textRuns": [
                   {
-                    "value": "Reconciliation checks and KPI definitions for this model. No slicers: these are whole-dataset checks. Data: Jul 2012 - Dec 2022 (2012 is a partial year, Jul-Dec only).",
+                    "value": "Reconciliation checks and KPI definitions for this model. Data: Jul 2012 - Dec 2022 (2012 is a partial year, Jul-Dec only).",
                     "textStyle": {
-                      "fontSize": "13pt",
-                      "fontWeight": "normal"
+                      "fontSize": "13pt"
                     }
                   }
                 ]
