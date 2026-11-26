@@ -66,14 +66,22 @@ table OrderItems
 		lineageTag: 34f1654f-20cf-44aa-bc34-8e386bdbb816
 		summarizeBy: none
 
-	column has_promo = NOT ISBLANK(OrderItems[promo_id]) || NOT ISBLANK(OrderItems[promo_id_2])
+	column has_promo = LEN(OrderItems[promo_id]) > 0 || LEN(OrderItems[promo_id_2]) > 0
 		dataType: boolean
 		lineageTag: b62baf9a-cf77-495b-bf67-b4b1f699df68
 		summarizeBy: none
 
-	column promo_channel_label = IF(ISBLANK(RELATED(Promotions[promo_channel])), "No Promotion", RELATED(Promotions[promo_channel]))
+	column promo_channel_label =
+			VAR ch = RELATED(Promotions[promo_channel])
+			VAR s = SUBSTITUTE(ch, "_", " ")
+			RETURN IF(ISBLANK(ch), "No Promotion", UPPER(LEFT(s, 1)) & MID(s, 2, 100))
 		dataType: string
 		lineageTag: a1d9b4e7-6c3f-4e0a-9f52-7e2c8b4d1a6e
+		summarizeBy: none
+
+	column 'Promo Status' = IF(OrderItems[has_promo], "Promo", "No Promo")
+		dataType: string
+		lineageTag: 8b5e2f17-3d9c-4a68-b1e4-0f7a6c2d9e53
 		summarizeBy: none
 
 	partition OrderItems = m

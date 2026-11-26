@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "fd0f2f8832ca471d8c9b",
+  "position": {
+    "x": 650,
+    "y": 142,
+    "z": 0,
+    "width": 300,
+    "height": 115,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Shipping Fee"
+                }
+              },
+              "queryRef": "_Measures.Avg Shipping Fee",
+              "nativeQueryRef": "Avg Shipping Fee"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "objects": {}
+  }
+}

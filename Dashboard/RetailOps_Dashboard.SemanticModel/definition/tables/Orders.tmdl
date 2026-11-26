@@ -62,6 +62,18 @@ table Orders
 		lineageTag: d9790e8c-ae0d-4eb5-a654-08d75fa49e04
 		summarizeBy: none
 
+	column 'Order Status' = UPPER(LEFT(Orders[order_status], 1)) & MID(Orders[order_status], 2, 100)
+		dataType: string
+		lineageTag: 5d1e8b3c-7a29-4f6e-b4c0-9e2a6d8f1c73
+		summarizeBy: none
+
+	column 'Order Channel' =
+			VAR s = SUBSTITUTE(Orders[order_source], "_", " ")
+			RETURN UPPER(LEFT(s, 1)) & MID(s, 2, 100)
+		dataType: string
+		lineageTag: 3e9c7b15-2d84-4a6f-b0e1-7c5a9d2f4b38
+		summarizeBy: none
+
 	partition Orders = m
 		mode: import
 		source =

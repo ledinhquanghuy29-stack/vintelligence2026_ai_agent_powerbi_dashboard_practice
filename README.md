@@ -51,7 +51,8 @@ customers ──< orders >── geography (zip)
 - **Revenue grew to a 2016 peak, then order volume dropped ~40% from 2019** while average order value kept climbing — fewer, larger orders, not a demand collapse.
 - **Inventory kept building while sales fell**: median days-of-supply rose from 96 (2012) to 454 (2020). Stock and demand moved in opposite directions for years — the central supply chain story in this dataset.
 - **Promotions run at a loss**: lines with a promotion average **−14% gross margin**, vs. **+20%** without. ~27% of all order lines sell below cost.
-- **A margin decline in 2021–2022 traced to product mix, not price or cost**: a shift toward lower-margin SKUs explains the drop almost exactly (confirmed with a shift-share decomposition), while list price and unit cost stayed constant.
+- **Gross margin follows a two-year promotion cycle**: odd years run 6 campaigns at ~21% average discount (adding Jan–Mar and Jul–Sep campaigns), even years run 4 at 15%. Odd years end at ~5–7% gross margin, even years at ~11–13%. Margin on non-promoted sales stays near 20% throughout, so the swing comes from the promotion calendar, not from cost or demand.
+- **A margin decline in 2021–2022 traced to product mix, not price or cost**: non-promoted margin slipped from ~20% to 17.4%, and a shift toward lower-margin SKUs explains the drop almost exactly (confirmed with a shift-share decomposition), while list price and unit cost stayed constant.
 - **Delivery and return rates are flat across every dimension tested** (region, category, size, year) — a useful finding in itself: there's no weak link to chase, so the dashboard tracks these as stable KPIs rather than manufacturing a false trend.
 - **Reviews cover only 17% of orders and 59% of products** — ratings are directional, not a full quality signal.
 - **Web traffic can't be tied to orders**: daily sessions correlate only 0.15 with daily delivered orders and share no join key, so it's kept to a small reference panel rather than a funnel narrative the data can't support.
@@ -64,7 +65,7 @@ Full findings, with every supporting number, are in [`Dashboard/DASHBOARD_INSTRU
 
 | Page | Covers |
 |---|---|
-| **Executive Overview** | Revenue by year, margin, delivery SLA %, return rate, distinct customers, repeat rate |
+| **Executive Overview** | Six KPIs, each with a YoY change or vs-target status; monthly revenue, margin and stock trends; category comparison |
 | **Sales and Margin** | Revenue trend, seasonality, product mix, promotion effect, promo-channel breakdown |
 | **Delivery and Returns** | Lead time vs. the 7-day SLA, shipping cost, return reasons and refunds |
 | **Inventory** | Monthly stock snapshot, days of supply, a sorted, filtered list of currently overstocked SKUs |
@@ -85,7 +86,7 @@ A few judgment calls an analyst has to make before the numbers mean anything —
 | Delivery SLA | ≤ 7 days | No promised-delivery-date field exists in the data, so this is an agreed target, not a contractual one |
 | Stockout | `stockout_days` ≥ 3 | At ≥ 1 day the rate hits 67% — too sensitive to be useful |
 | Overstock | `days_of_supply` > 180 | Median days of supply is 240, so this threshold actually separates cases |
-| Currency | VND for prices/costs, USD for shipping fee | Shipping fee is ~1,000x smaller than price columns — clearly a different scale |
+| Currency | All money values shown in $ | The source data states no currency; one unit across the whole report avoids mixing labels. Shipping fee sits on a much smaller scale than prices and is never added to them |
 
 ## Repository layout
 

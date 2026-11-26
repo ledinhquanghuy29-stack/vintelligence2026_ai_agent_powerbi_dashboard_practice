@@ -2,17 +2,17 @@ table _Measures
 	lineageTag: 687dd6df-1bdd-460f-b6ed-a97f77e07a07
 
 	measure 'Gross Sales' = CALCULATE(SUM(OrderItems[line_gross]), Orders[order_status] = "delivered")
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: ccc985f5-84c3-489a-8a46-f09bdcbffd33
 
 	measure 'Discount Amount' = CALCULATE(SUM(OrderItems[discount_amount]), Orders[order_status] = "delivered")
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: 286452b5-8e45-49b9-b002-08fe04dcdb12
 
 	measure 'Net Revenue' = [Gross Sales] - [Discount Amount]
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: d39d5245-609a-4e88-841e-98468095bf79
 
@@ -32,17 +32,17 @@ table _Measures
 		lineageTag: b366f157-6564-4cfb-8c73-81d3dfbcd1b7
 
 	measure AOV = DIVIDE([Net Revenue], [Order Count])
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: 1ae8dcba-0534-480a-b801-d9dde13abc41
 
 	measure COGS = CALCULATE(SUM(OrderItems[line_cost]), Orders[order_status] = "delivered")
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: a4a1847f-f9aa-46b0-8d4f-f36532e186c9
 
 	measure 'Gross Profit' = [Net Revenue] - [COGS]
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: cb6e77c9-5173-48b0-a169-8ea439cd364f
 
@@ -52,7 +52,7 @@ table _Measures
 		lineageTag: e9c99c65-130a-483a-bc8a-cdb03e3ff78b
 
 	measure 'Net Revenue PY' = CALCULATE([Net Revenue], SAMEPERIODLASTYEAR('Date'[Date]))
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: 1f11e49c-d5a5-4470-8c31-f221bc8bea43
 
@@ -69,7 +69,7 @@ table _Measures
 		lineageTag: 4be30a34-39e6-48fd-8558-00c7c36408a8
 
 	measure 'Promo Net Revenue' = CALCULATE([Net Revenue], OrderItems[has_promo] = TRUE())
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Sales
 		lineageTag: 8af988cb-e505-49bc-b5a9-9fb09f758ea9
 
@@ -130,7 +130,7 @@ table _Measures
 		lineageTag: 338c5ed4-9627-4801-8f82-a6e77b950dd0
 
 	measure 'Avg Lead Time' = CALCULATE(AVERAGE(Shipments[lead_days]), Orders[order_status] = "delivered")
-		formatString: 0.00
+		formatString: 0.0 "days"
 		displayFolder: Delivery
 		lineageTag: f0d2afaa-56ab-4489-9555-a8bc93b3a554
 
@@ -156,7 +156,13 @@ table _Measures
 		displayFolder: Delivery
 		lineageTag: 6022cf26-6711-4816-9225-0bdfbe5bbe46
 
-	measure 'Delivered Within SLA %' = DIVIDE([Delivered Within SLA], [Delivered Shipments])
+	measure 'Delivered Within SLA %' =
+			VAR Cutoff = CALCULATE(MAX(Shipments[delivery_date]), REMOVEFILTERS()) - 10
+			RETURN
+				DIVIDE(
+					CALCULATE([Delivered Within SLA], KEEPFILTERS('Date'[Date] <= Cutoff)),
+					CALCULATE([Delivered Shipments], KEEPFILTERS('Date'[Date] <= Cutoff))
+				)
 		formatString: 0.00%
 		displayFolder: Delivery
 		lineageTag: cff0d49a-5e17-4e8f-950a-8c3784eb26a2
@@ -200,13 +206,19 @@ table _Measures
 		displayFolder: Returns
 		lineageTag: 7fbea84e-77ca-4e60-bcee-248cfcd38414
 
-	measure 'Return Rate %' = DIVIDE([Return Units], [Units Received])
+	measure 'Return Rate %' =
+			VAR Cutoff = CALCULATE(MAX(Returns[return_date]), REMOVEFILTERS()) - 31
+			RETURN
+				DIVIDE(
+					CALCULATE([Return Units], KEEPFILTERS('Date'[Date] <= Cutoff)),
+					CALCULATE([Units Received], KEEPFILTERS('Date'[Date] <= Cutoff))
+				)
 		formatString: 0.00%
 		displayFolder: Returns
 		lineageTag: 9a608152-960e-4ce8-9308-2e341c530039
 
 	measure 'Refund Amount' = SUM(Returns[refund_amount])
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Returns
 		lineageTag: d7f55948-011c-4c6a-b5ca-9200605e392c
 
@@ -221,7 +233,7 @@ table _Measures
 		lineageTag: 912c5aa4-24ae-4dab-87e5-dfbafe96aece
 
 	measure 'Avg Days to Return' = AVERAGE(Returns[days_to_return])
-		formatString: 0.0
+		formatString: 0.0 "days"
 		displayFolder: Returns
 		lineageTag: f2f3f829-2eec-477c-a050-ad197161d802
 
@@ -290,47 +302,47 @@ table _Measures
 		lineageTag: 5b370782-9344-49ad-96c3-a04fdbd30982
 
 	measure 'Gross Sales (All Statuses)' = CALCULATE(SUM(OrderItems[line_gross]), REMOVEFILTERS(Orders[order_status]))
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Validation
 		lineageTag: ead96138-1520-4071-a91f-ad4cca2d99a5
 
 	measure 'sales.csv Revenue' = SUM(sales[Revenue])
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Validation
 		lineageTag: 9591efd2-1bac-4e1e-86c1-f9012d3caa6e
 
 	measure 'Diff Gross Sales vs sales.csv' = [Gross Sales (All Statuses)] - [sales.csv Revenue]
-		formatString: #,0.00 "VND"
+		formatString: $#,0.00
 		displayFolder: Validation
 		lineageTag: c6170cb5-0312-4bf9-8e05-97de603b821f
 
 	measure 'COGS (All Statuses)' = CALCULATE(SUM(OrderItems[line_cost]), REMOVEFILTERS(Orders[order_status]))
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Validation
 		lineageTag: 6e9fb4dc-d44f-4a78-b7ca-315cc0114694
 
 	measure 'sales.csv COGS' = SUM(sales[COGS])
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Validation
 		lineageTag: 5b0c8020-7967-43a1-9b00-dd40c8c0c678
 
 	measure 'Diff COGS vs sales.csv' = [COGS (All Statuses)] - [sales.csv COGS]
-		formatString: #,0.00 "VND"
+		formatString: $#,0.00
 		displayFolder: Validation
 		lineageTag: cfd5841b-3fa8-4d28-a966-005d6741a169
 
 	measure 'Net Revenue (All Statuses)' = CALCULATE(SUM(OrderItems[line_net]), REMOVEFILTERS(Orders[order_status]))
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Validation
 		lineageTag: c96ca4e7-adb3-4c34-9e8c-84d964f389ad
 
 	measure 'payments Total' = SUM(payments[payment_value])
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Validation
 		lineageTag: 6e67c5f2-c458-4a92-9c0e-e4b1bb823183
 
 	measure 'Diff Net vs payments' = [Net Revenue (All Statuses)] - [payments Total]
-		formatString: #,0.00 "VND"
+		formatString: $#,0.00
 		displayFolder: Validation
 		lineageTag: 11c6afe7-fe64-43c3-adea-7883d2fd9a03
 
@@ -345,7 +357,7 @@ table _Measures
 		lineageTag: 041bb742-618a-4605-b120-8c17ead7a4d5
 
 	measure 'Revenue per Customer' = DIVIDE([Net Revenue], [Distinct Customers])
-		formatString: #,0 "VND"
+		formatString: $#,0
 		displayFolder: Customers
 		lineageTag: 610da671-2a19-42f9-82c9-b548eed7a61a
 
@@ -372,22 +384,22 @@ table _Measures
 		displayFolder: Customers
 		lineageTag: c0bfae7d-a402-4f11-94ee-a2f3c7a2abde
 
-	measure 'Average Rating' = AVERAGE(Reviews[rating])
+	measure 'Average Rating' = CALCULATE(AVERAGE(Reviews[rating]), TREATAS(VALUES(Orders[order_id]), Reviews[order_id]))
 		formatString: 0.00
 		displayFolder: Reviews
 		lineageTag: e7f48aa7-afd9-45be-bf88-caf18a468f41
 
-	measure 'Review Count' = COUNTROWS(Reviews)
+	measure 'Review Count' = CALCULATE(COUNTROWS(Reviews), TREATAS(VALUES(Orders[order_id]), Reviews[order_id]))
 		formatString: #,0
 		displayFolder: Reviews
 		lineageTag: 02d58215-740d-40b4-8c86-53ee3703b865
 
-	measure 'Positive Review %' = DIVIDE(CALCULATE(COUNTROWS(Reviews), Reviews[rating] >= 4), [Review Count])
+	measure 'Positive Review %' = DIVIDE(CALCULATE([Review Count], Reviews[rating] >= 4), [Review Count])
 		formatString: 0.0%
 		displayFolder: Reviews
 		lineageTag: 1ff5e304-fc8a-44fe-9d3c-0a7bcf6b9286
 
-	measure 'Negative Review %' = DIVIDE(CALCULATE(COUNTROWS(Reviews), Reviews[rating] <= 2), [Review Count])
+	measure 'Negative Review %' = DIVIDE(CALCULATE([Review Count], Reviews[rating] <= 2), [Review Count])
 		formatString: 0.0%
 		displayFolder: Reviews
 		lineageTag: 3b54a0f7-a216-4f8a-acda-046526c6c99b
@@ -411,6 +423,194 @@ table _Measures
 		formatString: 0.00%
 		displayFolder: Web Traffic
 		lineageTag: 391257bc-3dae-4855-b6db-a7c92b698f29
+
+	measure 'Net Revenue YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Net Revenue], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Net Revenue], 'Date'[Year] = PrevYear, Months)
+				VAR Pct = DIVIDE(CurVal - PrevVal, PrevVal)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Pct >= 0, "🟢 ▲ ", "🔴 ▼ ") & FORMAT(ABS(Pct), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: a1b2c3d4-0001-4aaa-9001-000000000001
+
+	measure 'Gross Margin % YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Gross Margin %], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Gross Margin %], 'Date'[Year] = PrevYear, Months)
+				VAR Diff = CurVal - PrevVal
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Diff >= 0, "🟢 ▲ ", "🔴 ▼ ") & FORMAT(ABS(Diff) * 100, "0.0") & " pts" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: a1b2c3d4-0002-4aaa-9002-000000000002
+
+	measure 'Delivered Within SLA % Status Label' = ```
+				VAR CurVal = [Delivered Within SLA %]
+				RETURN
+					IF(
+						ISBLANK(CurVal),
+						"No data",
+						IF(CurVal >= 0.95, "🟢 On target (≥95%)", "🔴 Below target (≥95%)")
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: a1b2c3d4-0003-4aaa-9003-000000000003
+
+	measure 'Return Rate % Status Label' = ```
+				VAR CurVal = [Return Rate %]
+				RETURN
+					IF(
+						ISBLANK(CurVal),
+						"No data",
+						IF(CurVal <= 0.05, "🟢 Within limit (≤5%)", "🔴 Above limit (≤5%)")
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: a1b2c3d4-0004-4aaa-9004-000000000004
+
+	measure 'Distinct Customers YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Distinct Customers], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Distinct Customers], 'Date'[Year] = PrevYear, Months)
+				VAR Pct = DIVIDE(CurVal - PrevVal, PrevVal)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Pct >= 0, "🟢 ▲ ", "🔴 ▼ ") & FORMAT(ABS(Pct), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: a1b2c3d4-0005-4aaa-9005-000000000005
+
+	measure 'Repeat Customer Rate % YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Repeat Customer Rate %], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Repeat Customer Rate %], 'Date'[Year] = PrevYear, Months)
+				VAR Diff = CurVal - PrevVal
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Diff >= 0, "🟢 ▲ ", "🔴 ▼ ") & FORMAT(ABS(Diff) * 100, "0.0") & " pts" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: a1b2c3d4-0006-4aaa-9006-000000000006
+
+	measure 'Ending Stock Value' =
+			VAR d = MAX(Inventory[snapshot_date])
+			RETURN CALCULATE(SUM(Inventory[Stock Value]), Inventory[snapshot_date] = d)
+		formatString: $#,0
+		displayFolder: Inventory
+		lineageTag: 9b3e6f21-4c7a-4d85-a1f0-3e8b2c5d7f64
+
+	measure 'Gross Margin % (Rolling 12M)' =
+			VAR LastD = MAX('Date'[Date])
+			VAR WinStart = EOMONTH(LastD, -12) + 1
+			VAR FirstData = CALCULATE(MIN(Orders[order_date]), REMOVEFILTERS())
+			RETURN
+				IF(
+					WinStart >= DATE(YEAR(FirstData), MONTH(FirstData), 1),
+					CALCULATE([Gross Margin %], REMOVEFILTERS('Date'), DATESINPERIOD('Date'[Date], LastD, -12, MONTH))
+				)
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 4b8e2d61-9c3a-4f7e-a5d2-1e6c8b3f9a70
+
+	measure 'Median Days of Supply (Rolling 12M)' =
+			VAR LastD = MAX('Date'[Date])
+			VAR WinStart = EOMONTH(LastD, -12) + 1
+			VAR FirstData = CALCULATE(MIN(Inventory[snapshot_date]), REMOVEFILTERS())
+			RETURN
+				IF(
+					WinStart >= DATE(YEAR(FirstData), MONTH(FirstData), 1),
+					CALCULATE([Median Days of Supply], REMOVEFILTERS('Date'), DATESINPERIOD('Date'[Date], LastD, -12, MONTH))
+				)
+		formatString: #,0
+		displayFolder: Inventory
+		lineageTag: 2a9d6e14-8b3c-4f51-9e72-5c0a1d8b4f36
+
+	measure 'Overstock Rate % (Within Target)' = MIN([Overstock Rate %], 0.30)
+		formatString: 0.0%
+		displayFolder: Comparisons
+		lineageTag: 6a3d9f12-7e4b-4c85-a1d6-9b2e5f8c3a47
+
+	measure 'Overstock Rate % (Above Target)' = IF([Overstock Rate %] > 0.30, [Overstock Rate %] - 0.30)
+		formatString: 0.0%
+		displayFolder: Comparisons
+		lineageTag: 3c8e1b74-5f2a-4d96-b7e0-2a4f6d9c1e58
+
+	measure 'Gross Margin % (Positive)' = IF([Gross Margin %] >= 0, [Gross Margin %])
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 8f1b4d27-2c6e-4a93-9d5f-7e3a1c8b6d24
+
+	measure 'Gross Margin % (Negative)' = IF([Gross Margin %] < 0, [Gross Margin %])
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 2d7a5e91-8b3f-4c16-a4e2-5f9c3b7d1a86
+
+	measure 'SLA Target' = IF(NOT ISBLANK([Delivered Within SLA %]), 0.95)
+		formatString: 0%
+		displayFolder: Comparisons
+		lineageTag: 9e4b1c72-6d3a-4e85-b0f9-2a7c5e8d1b43
+
+	measure 'Return Rate Target' = IF(NOT ISBLANK([Return Rate %]), 0.05)
+		formatString: 0%
+		displayFolder: Comparisons
+		lineageTag: 5f2a8d39-1c6e-4b07-9a34-8e1d3c7b6f25
+
+	measure 'Overstock Rate Target' = IF(NOT ISBLANK([Overstock Rate %]), 0.30)
+		formatString: 0%
+		displayFolder: Comparisons
+		lineageTag: 1d7c3e95-4a8b-4f26-b5e0-6c9a2f4d8e17
 
 	column Dummy
 		dataType: int64

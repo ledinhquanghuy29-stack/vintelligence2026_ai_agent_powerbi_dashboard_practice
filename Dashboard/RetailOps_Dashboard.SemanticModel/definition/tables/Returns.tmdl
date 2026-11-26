@@ -57,6 +57,13 @@ table Returns
 		lineageTag: 9745aa3d-faf4-4a55-84e7-03950d6d49c6
 		summarizeBy: none
 
+	column 'Return Reason' =
+			VAR s = SUBSTITUTE(Returns[return_reason], "_", " ")
+			RETURN UPPER(LEFT(s, 1)) & MID(s, 2, 100)
+		dataType: string
+		lineageTag: 2c7f4a91-8e3b-4d6c-a0f5-1b9e7d3c5a28
+		summarizeBy: none
+
 	partition Returns = m
 		mode: import
 		source =

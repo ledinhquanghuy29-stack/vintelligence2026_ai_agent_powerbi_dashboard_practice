@@ -53,6 +53,12 @@ table Date
 		summarizeBy: none
 		sourceColumn: [Is Partial Year]
 
+	column 'Month Start' = DATE('Date'[Year], 'Date'[Month Number], 1)
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 6e2b9d47-1f3a-4c8e-b5d0-8a7c3e1f4b92
+		summarizeBy: none
+
 	partition Date = calculated
 		mode: import
 		source =

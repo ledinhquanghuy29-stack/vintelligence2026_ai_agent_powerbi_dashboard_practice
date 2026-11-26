@@ -127,6 +127,17 @@ table Inventory
 		lineageTag: 3c9f7a1e-5b82-4d6f-9e4a-1c8b5f2e7a93
 		summarizeBy: none
 
+	column 'Stock Value' = Inventory[stock_on_hand] * RELATED(Products[cogs])
+		dataType: double
+		formatString: $#,0
+		lineageTag: 7d2e4b19-6a3f-4c58-9b0e-2f1a8c6d5e47
+		summarizeBy: sum
+
+	column 'Days of Supply' = IF(Inventory[days_of_supply] > 365, "> 365", FORMAT(Inventory[days_of_supply], "#,0"))
+		dataType: string
+		lineageTag: 4f8a1c3e-9d27-4b6a-8e51-6c0b2d7f9a13
+		summarizeBy: none
+
 	partition Inventory = m
 		mode: import
 		source =

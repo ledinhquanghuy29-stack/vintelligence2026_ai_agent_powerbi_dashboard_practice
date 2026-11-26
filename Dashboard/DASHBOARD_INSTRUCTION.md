@@ -57,8 +57,8 @@ Not every slicer reaches every page — filters only flow from the "one" side to
 | Delivery SLA | Lead time (`delivery_date − order_date`) ≤ 7 days |
 | Stockout | `stockout_days ≥ 3` in a product-month |
 | Overstock | `days_of_supply > 180` |
-| Return rate | Units returned ÷ units sold, over `delivered` + `returned` orders |
-| Currency | VND for prices/costs/revenue; USD for `shipping_fee` (different scale, never summed) |
+| Return rate | Units returned ÷ units sold, over `delivered` + `returned` orders, excluding orders placed in the last 31 days of data (their return window — max observed order-to-return lag is 31 days — hadn't closed) |
+| Currency | All money values in $ (source data states no currency); `shipping_fee` is on a much smaller scale and never summed with prices |
 | Calendar | Standard Jan–Dec year; 2012 is a partial year (Jul–Dec only) |
 
 ---
@@ -68,7 +68,7 @@ Not every slicer reaches every page — filters only flow from the "one" side to
 | Table | Column | Logic |
 |---|---|---|
 | `OrderItems` | `line_gross` / `line_net` / `line_cost` | Standard revenue/cost line math |
-| `OrderItems` | `has_promo` | `NOT ISBLANK(promo_id) OR NOT ISBLANK(promo_id_2)` |
+| `OrderItems` | `has_promo` | `LEN(promo_id) > 0 OR LEN(promo_id_2) > 0` (empty CSV cells load as `""`, not blank, so `ISBLANK` can't be used) |
 | `OrderItems` | `promo_channel_label` | `Promotions[promo_channel]` via `RELATED`, or `"No Promotion"` if unmatched |
 | `Products` | `list_margin` / `list_margin_tier` | `1 − cogs/price`, bucketed into Low/Mid/High terciles |
 | `Shipments` | `lead_days` / `processing_days` / `transit_days` | Date differences vs. the related order |
@@ -94,13 +94,13 @@ Not every slicer reaches every page — filters only flow from the "one" side to
 | Measure | DAX |
 |---|---|
 | Avg Lead Time | `CALCULATE(AVERAGE(Shipments[lead_days]), Delivered)` |
-| Delivered Within SLA % | Delivered shipments with `lead_days ≤ [SLA Days]` ÷ all delivered shipments |
+| Delivered Within SLA % | Delivered shipments with `lead_days ≤ [SLA Days]` ÷ all delivered shipments, both restricted to order dates ≤ (last delivery date − 10); max observed lead time is 10 days, so later orders only show the ones that happened to arrive fast |
 | High-Fee Order Share % | Share of shipped orders with `shipping_fee ≥ 10` |
 
 ### Returns
 | Measure | DAX |
 |---|---|
-| Return Rate % | `DIVIDE([Return Units], [Units Received])`, over `delivered` + `returned` orders |
+| Return Rate % | `DIVIDE([Return Units], [Units Received])`, over `delivered` + `returned` orders, both restricted to order dates ≤ (last return date − 31) |
 | Refund % of Net | Refund amount over net revenue of the same order cohort |
 
 ### Inventory
@@ -117,7 +117,7 @@ Not every slicer reaches every page — filters only flow from the "one" side to
 | Distinct Customers | Delivered-order customers |
 | Repeat Customer Rate % | Customers with > 1 delivered order ÷ all buying customers |
 | New Customers | Customers whose `first_delivered_order_date` falls inside the current Date filter |
-| Average Rating / Review Count | Straight `AVERAGE`/`COUNTROWS` on `Reviews` |
+| Average Rating / Review Count | `AVERAGE`/`COUNTROWS` on `Reviews`, filtered with `TREATAS(VALUES(Orders[order_id]), Reviews[order_id])` so reviews follow the order-date, region and channel filters. The `Orders → Reviews` relationship stays inactive (activating it recreates the Round 4 ambiguous path) |
 
 What-if parameters exposed as slicers: **SLA Days** (default 7), **Stockout Days Threshold** (default 3), **Overstock Days Threshold** (default 180).
 
@@ -129,18 +129,23 @@ All six pages share one 1,920×1,300 canvas, a shared top-down layout (title →
 
 | Page | Main trend | Drivers | Detail |
 |---|---|---|---|
-| **Executive Overview** | Net Revenue by Year (the whole revenue arc in one chart) | Seasonality, days-of-supply trend | Category summary table + Net Revenue by Category donut |
-| **Sales and Margin** | Net Revenue (columns) + Order Count (line) combo chart | Seasonality index, product-mix tier, promo vs. non-promo margin | Category table + margin chart + Net Revenue by Promo Channel |
-| **Delivery and Returns** | SLA % and Return Rate % by month | Order status mix (donut), shipping fee group, return reasons | Orders-by-status table, returns-by-reason table, return units by category |
-| **Inventory** | Ending stock and sell-through by month | Days-of-supply seasonality, receipt-to-sales ratio | Category summary + a filtered, sorted **SKU-level overstock exception list** |
-| **Customers and Satisfaction** | Distinct Customers by Year | Revenue by acquisition channel, rating by category, a compact Web Traffic reference panel | Review summary table + rating distribution donut |
+| **Executive Overview** | Slicers: year, month, region, category, sales channel. Net Revenue by month across all 10 years; KPI cards with a YoY or vs-target status line | Median days of supply (rolling 12 months), Net Revenue by category | Gross margin % by category, overstock rate % by category vs the 30% target, gross margin % (rolling 12 months). No tables on this page |
+| **Sales and Margin** | Net Revenue + Order Count combo; promo revenue share (columns) + gross margin % (line) combo | Seasonality index, product-mix tier, gross margin % by promo status | Category table + margin chart + Net Revenue by Promo Channel |
+| **Delivery and Returns** | SLA % and Return Rate % by month, each with its target drawn as a second line | Order status mix, shipping fee group, refund amount by return reason (ranked) | Orders-by-status table, returns-by-reason table, return units by category |
+| **Inventory** | Ending stock and sell-through by month | Days-of-supply seasonality, ending stock value by category | Category summary + a filtered **SKU-level overstock exception list**, ranked by stock value |
+| **Customers and Satisfaction** | Distinct Customers by month | Revenue by acquisition channel, positive review % by month, a compact Web Traffic reference panel | Review summary table + review count by rating |
 | **Data Quality and Definitions** | — | — | Reconciliation table (model totals vs. independent benchmarks), known data exceptions, KPI glossary |
 
 ### Design principles used throughout
 - **Flat dimensions aren't charted as if they vary.** Lead time, return rate and shipping fee are statistically flat across region/category/year in this dataset — those comparisons were deliberately left out rather than manufacturing a misleading chart.
 - **A table is sized to its content, not stretched to fill the page.** Power BI's table visual doesn't auto-fill unused width; any space freed next to a table holds a paired chart on the same dimension instead of blank canvas.
-- **Chart type matches the question**: donut charts for low-cardinality compositions (≤ 6 categories), a combo chart where two series need to be compared directly, bar/column for everything else.
-- **Every detail table/chart pairing states its date basis** (order date, snapshot date, or review date) in the subtitle, since several tables use different date roles.
+- **Chart type matches the question**: bar/column for comparisons (no donuts — one category holds ~80% of revenue, which makes small slices unreadable), a combo chart with a secondary axis whenever two series are on different scales.
+- **Time trends use a continuous monthly axis** (`'Date'[Month Start]`), so all 10 years fit without a scrollbar and the chart still has a shape when a single year is selected. No chart uses Year as its axis.
+- **Titles name what is shown, not what it means.** Interpretation belongs to the reader; a title carries at most a definition or a target (e.g. "target ≥ 95%").
+- **Volatile monthly ratios get a rolling view on the Overview, and an explanation on the detail page.** Gross margin swings below zero in promo-heavy months (correlation with promo revenue share: −0.83), so the Overview shows a 12-month rolling margin, and the Sales page pairs monthly margin with promo revenue share so the dips explain themselves.
+- **Targets are drawn, not just stated.** A constant measure per target (`SLA Target`, `Return Rate Target`, `Overstock Rate Target`) plots as a second series on the same axis, so the gap to target is visible.
+- **One colour, one meaning, on every page.** Navy = the main actual value; teal = volume (orders, units); amber = promotions; green / red = good / bad only (within vs above target, positive vs negative margin); grey dashed = targets and reference lines. Review ratings 1→5 run red → green.
+- **Ranked bars are sorted largest first.** Every horizontal bar chart sorts descending by its measure; categories with a natural order (rating 1–5, calendar month) keep that order.
 
 ---
 

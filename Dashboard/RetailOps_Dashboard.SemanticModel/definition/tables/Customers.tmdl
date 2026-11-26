@@ -56,6 +56,13 @@ table Customers
 		lineageTag: dbd8d86a-56c8-4fe8-b25c-433a4bcf6cb4
 		summarizeBy: none
 
+	column 'Acquisition Channel' =
+			VAR s = SUBSTITUTE(Customers[acquisition_channel], "_", " ")
+			RETURN UPPER(LEFT(s, 1)) & MID(s, 2, 100)
+		dataType: string
+		lineageTag: 8a4d2f6e-3b91-4c7a-9e58-5f1c0b7d2e36
+		summarizeBy: none
+
 	partition Customers = m
 		mode: import
 		source =

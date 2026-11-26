@@ -11,7 +11,7 @@
       "type": "SharedResources"
     },
     "customTheme": {
-      "name": "SupplyChainTheme",
+      "name": "SupplyChainTheme.json",
       "reportVersionAtImport": {
         "visual": "2.14.0",
         "report": "3.4.0",
@@ -65,8 +65,8 @@
       "type": "RegisteredResources",
       "items": [
         {
-          "name": "SupplyChainTheme",
-          "path": "SupplyChainTheme",
+          "name": "SupplyChainTheme.json",
+          "path": "SupplyChainTheme.json",
           "type": "CustomTheme"
         }
       ]
