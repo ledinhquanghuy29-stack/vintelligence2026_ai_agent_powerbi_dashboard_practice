@@ -125,12 +125,12 @@ What-if parameters exposed as slicers: **SLA Days** (default 7), **Stockout Days
 
 ## 5. Page design
 
-All six pages share one 1,920×1,300 canvas, a shared top-down layout (title → purpose line → slicers → KPI cards → main trend → driver charts → a detail table), and one custom colour theme.
+All six pages share one 1,920×1,300 canvas, a page navigator in the header, a shared top-down layout (title → purpose line → slicers → KPI cards, each with a YoY or vs-target line → main trend → driver charts → a detail table), and one custom colour theme.
 
 | Page | Main trend | Drivers | Detail |
 |---|---|---|---|
 | **Executive Overview** | Slicers: year, month, region, category, sales channel. Net Revenue by month across all 10 years; KPI cards with a YoY or vs-target status line | Median days of supply (rolling 12 months), Net Revenue by category | Gross margin % by category, overstock rate % by category vs the 30% target, gross margin % (rolling 12 months). No tables on this page |
-| **Sales and Margin** | Net Revenue + Order Count combo; promo revenue share (columns) + gross margin % (line) combo | Seasonality index, product-mix tier, gross margin % by promo status | Category table + margin chart + Net Revenue by Promo Channel |
+| **Sales and Margin** | Net Revenue + Order Count combo; gross margin % by monthly promo revenue share band (under 20% / 20–60% / 60% and above) | Seasonality index, product-mix tier, gross margin % by promo status | Category table + gross margin % by year, bars coloured by promotion intensity (amber = 6-campaign years, navy = 4) + Net Revenue by Promo Channel |
 | **Delivery and Returns** | SLA % and Return Rate % by month, each with its target drawn as a second line | Order status mix, shipping fee group, refund amount by return reason (ranked) | Orders-by-status table, returns-by-reason table, return units by category |
 | **Inventory** | Ending stock and sell-through by month | Days-of-supply seasonality, ending stock value by category | Category summary + a filtered **SKU-level overstock exception list**, ranked by stock value |
 | **Customers and Satisfaction** | Distinct Customers by month | Revenue by acquisition channel, positive review % by month, a compact Web Traffic reference panel | Review summary table + review count by rating |

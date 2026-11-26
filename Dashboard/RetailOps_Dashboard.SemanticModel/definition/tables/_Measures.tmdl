@@ -577,6 +577,21 @@ table _Measures
 		displayFolder: Inventory
 		lineageTag: 2a9d6e14-8b3c-4f51-9e72-5c0a1d8b4f36
 
+	measure 'SLA Target' = IF(NOT ISBLANK([Delivered Within SLA %]), 0.95)
+		formatString: 0%
+		displayFolder: Comparisons
+		lineageTag: 9e4b1c72-6d3a-4e85-b0f9-2a7c5e8d1b43
+
+	measure 'Return Rate Target' = IF(NOT ISBLANK([Return Rate %]), 0.05)
+		formatString: 0%
+		displayFolder: Comparisons
+		lineageTag: 5f2a8d39-1c6e-4b07-9a34-8e1d3c7b6f25
+
+	measure 'Overstock Rate Target' = IF(NOT ISBLANK([Overstock Rate %]), 0.30)
+		formatString: 0%
+		displayFolder: Comparisons
+		lineageTag: 1d7c3e95-4a8b-4f26-b5e0-6c9a2f4d8e17
+
 	measure 'Overstock Rate % (Within Target)' = MIN([Overstock Rate %], 0.30)
 		formatString: 0.0%
 		displayFolder: Comparisons
@@ -597,20 +612,434 @@ table _Measures
 		displayFolder: Sales
 		lineageTag: 2d7a5e91-8b3f-4c16-a4e2-5f9c3b7d1a86
 
-	measure 'SLA Target' = IF(NOT ISBLANK([Delivered Within SLA %]), 0.95)
-		formatString: 0%
+	measure 'Order Count YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Order Count], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Order Count], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
 		displayFolder: Comparisons
-		lineageTag: 9e4b1c72-6d3a-4e85-b0f9-2a7c5e8d1b43
+		lineageTag: 686ede71-bb2e-4c82-aefc-6ed2c05a078c
 
-	measure 'Return Rate Target' = IF(NOT ISBLANK([Return Rate %]), 0.05)
-		formatString: 0%
+	measure 'Units Sold YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Units Sold], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Units Sold], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
 		displayFolder: Comparisons
-		lineageTag: 5f2a8d39-1c6e-4b07-9a34-8e1d3c7b6f25
+		lineageTag: 9b12a6ea-ed8d-441e-8ec5-65b69abe9f66
 
-	measure 'Overstock Rate Target' = IF(NOT ISBLANK([Overstock Rate %]), 0.30)
-		formatString: 0%
+	measure 'AOV YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([AOV], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([AOV], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
 		displayFolder: Comparisons
-		lineageTag: 1d7c3e95-4a8b-4f26-b5e0-6c9a2f4d8e17
+		lineageTag: defac721-e51a-4c30-a191-daf6f8c34e1a
+
+	measure 'Discount Rate YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Discount Rate], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Discount Rate], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = CurVal - PrevVal
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Delta <= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta) * 100, "0.0") & " pts" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 160d18d4-3ce4-4488-97a2-b54be1430c80
+
+	measure 'Avg Lead Time YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Avg Lead Time], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Avg Lead Time], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = CurVal - PrevVal
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Delta <= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0") & " days" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: eeb596f4-8bc6-4a76-a55b-47cf471c0172
+
+	measure 'Avg Shipping Fee YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Avg Shipping Fee], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Avg Shipping Fee], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta <= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: ae22a100-ad6a-41ed-b1a1-1877833b7a06
+
+	measure 'Refund Amount YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Refund Amount], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Refund Amount], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta <= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 1d90f0b9-48c0-4c36-b7c0-b8746c60201a
+
+	measure 'Avg Days to Return YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Avg Days to Return], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Avg Days to Return], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = CurVal - PrevVal
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						"⚪ " & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0") & " days" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 3ef65a7a-87ff-40fa-8ee4-5b65691f5e49
+
+	measure 'Ending Stock YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Ending Stock], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Ending Stock], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta <= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 6151ade8-c5c9-465e-a099-c39c89623aa9
+
+	measure 'Median Days of Supply YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Median Days of Supply], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Median Days of Supply], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta <= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 22967d2e-e95b-4276-a5ef-9d3c377f7960
+
+	measure 'Avg Fill Rate YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Avg Fill Rate], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Avg Fill Rate], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = CurVal - PrevVal
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta) * 100, "0.0") & " pts" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 3c466c0e-6b28-4163-84f8-5e30b5c8eb12
+
+	measure 'Sell-Through % YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Sell-Through %], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Sell-Through %], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = CurVal - PrevVal
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta) * 100, "0.0") & " pts" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: df190af0-7af2-4f99-9230-88c97ee66210
+
+	measure 'Revenue per Customer YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Revenue per Customer], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Revenue per Customer], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: c5e92302-cbf4-4ebc-8034-0a2beb7caabf
+
+	measure 'Average Rating YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Average Rating], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Average Rating], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = CurVal - PrevVal
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.00") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 01d1a08d-acd7-43e3-ad04-deee97d10faf
+
+	measure 'Review Count YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Review Count], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Review Count], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = DIVIDE(CurVal - PrevVal, PrevVal)
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal) || PrevVal = 0,
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta), "0.0%") & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 5e932f30-bb89-4d4b-99e3-b56b883833d9
+
+	measure 'Positive Review % YoY Label' = ```
+				VAR CurYear = MAX('Date'[Year])
+				VAR PrevYear = CurYear - 1
+				VAR Months =
+					FILTER(
+						CALCULATETABLE(VALUES('Date'[Month Number]), 'Date'[Year] = CurYear),
+						NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = CurYear))
+							&& NOT ISBLANK(CALCULATE([Net Revenue], 'Date'[Year] = PrevYear))
+					)
+				VAR N = COUNTROWS(Months)
+				VAR CurVal = CALCULATE([Positive Review %], 'Date'[Year] = CurYear, Months)
+				VAR PrevVal = CALCULATE([Positive Review %], 'Date'[Year] = PrevYear, Months)
+				VAR Period = " (" & CurYear & " vs " & PrevYear & IF(N < 12, ", " & N & " mo", "") & ")"
+				VAR Delta = CurVal - PrevVal
+				RETURN
+					IF(
+						N = 0 || ISBLANK(PrevVal),
+						"No " & PrevYear & " data to compare",
+						IF(Delta >= 0, "🟢 ", "🔴 ") & IF(Delta >= 0, "▲ ", "▼ ") & FORMAT(ABS(Delta) * 100, "0.0") & " pts" & Period
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: a169f0a5-79ec-4a85-9569-ad6205d6caf9
+
+	measure 'Overstock Rate % Status Label' = ```
+				VAR CurVal = [Overstock Rate %]
+				RETURN
+					IF(
+						ISBLANK(CurVal),
+						"No data",
+						IF(CurVal <= 0.30, "🟢 Within limit (≤30%)", "🔴 Above limit (≤30%)")
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: 0afa99b9-0516-4be1-9624-02b6c98536a5
+
+	measure 'Stockout Rate % Status Label' = ```
+				VAR CurVal = [Stockout Rate %]
+				RETURN
+					IF(
+						ISBLANK(CurVal),
+						"No data",
+						IF(CurVal <= 0.05, "🟢 Within limit (≤5%)", "🔴 Above limit (≤5%)")
+					)
+			```
+		displayFolder: Comparisons
+		lineageTag: c9decc83-4865-4115-bcaf-56f144df1ad3
+
+	measure 'Promo Campaigns Started' =
+			VAR Yrs = VALUES('Date'[Year])
+			RETURN COUNTROWS(FILTER(Promotions, YEAR(Promotions[start_date]) IN Yrs))
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: 85a2eb37-577b-48e0-b498-35564fb66998
+
+	measure 'Gross Margin % by Promo Band' =
+			VAR MinS = MIN('Promo Share Band'[Min Share])
+			VAR MaxS = MAX('Promo Share Band'[Max Share])
+			VAR BandMonths =
+				FILTER(
+					VALUES('Date'[Month Start]),
+					VAR s = [Promo Revenue Share %]
+					RETURN NOT ISBLANK(s) && s >= MinS && s < MaxS
+				)
+			RETURN CALCULATE([Gross Margin %], BandMonths)
+		formatString: 0.0%
+		displayFolder: Sales
+		lineageTag: 6f9a2c84-3e1b-4d75-a8c6-0b4e7d2f9a16
 
 	column Dummy
 		dataType: int64

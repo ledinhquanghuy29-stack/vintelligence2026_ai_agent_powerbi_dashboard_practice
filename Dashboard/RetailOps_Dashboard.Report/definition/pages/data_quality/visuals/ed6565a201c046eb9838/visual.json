@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "ed6565a201c046eb9838",
+  "position": {
+    "x": 980,
+    "y": 788,
+    "z": 1000,
+    "width": 908,
+    "height": 216,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Which Date Each Page Uses",
+                    "textStyle": {
+                      "fontSize": "17pt",
+                      "fontWeight": "bold",
+                      "color": "#6C7A92"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Sales, margin, delivery, returns and customer counts follow Order Date: the Year and Month slicers filter by when the order was placed. Reviews are counted through the order they belong to, so they follow Order Date too. Inventory follows the monthly snapshot date, is never summed across months, and does not respond to region or channel. Web traffic has its own daily date and no link to orders.",
+                    "textStyle": {
+                      "fontSize": "15pt",
+                      "fontWeight": "normal",
+                      "color": "#2F3B46"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

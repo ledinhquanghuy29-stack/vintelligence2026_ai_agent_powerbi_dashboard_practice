@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "87b4eef7d7ea44a0a47e",
+  "position": {
+    "x": 980,
+    "y": 532,
+    "z": 1000,
+    "width": 908,
+    "height": 216,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "KPI Targets and Comparisons",
+                    "textStyle": {
+                      "fontSize": "17pt",
+                      "fontWeight": "bold",
+                      "color": "#4C9F70"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Delivered Within SLA % \u2265 95%. Return Rate % \u2264 5%. Overstock Rate % \u2264 30%. Stockout Rate % \u2264 5%. These targets are assumptions set for this dashboard; the source data states none. The YoY line under each KPI compares the latest selected year with the year before, using only months present in both years (2013 vs 2012 compares Jul-Dec only). Return Rate % leaves out orders placed in the last 31 days of the data, and Delivered Within SLA % leaves out orders placed in the last 10 days, because those orders' return or delivery window had not closed when the data ends.",
+                    "textStyle": {
+                      "fontSize": "15pt",
+                      "fontWeight": "normal",
+                      "color": "#2F3B46"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

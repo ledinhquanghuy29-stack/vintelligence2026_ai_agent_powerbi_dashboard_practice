@@ -1,0 +1,44 @@
+table 'Promo Share Band'
+	lineageTag: 7b2e9c41-5d3a-4f86-a0e7-1c9d4b6f2a83
+
+	column Band
+		dataType: string
+		lineageTag: 3a8f1d62-9c4e-4b57-8e21-6d0b7a3c5f94
+		summarizeBy: none
+		sourceColumn: [Band]
+		sortByColumn: 'Band Order'
+
+	column 'Band Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9d4c7e18-2b6a-4f39-a5d0-8e1f3b7c6a25
+		summarizeBy: none
+		sourceColumn: [Band Order]
+
+	column 'Min Share'
+		dataType: double
+		isHidden
+		lineageTag: 5e1a8b39-7f2d-4c64-9b03-2a6e4d8c1f57
+		summarizeBy: none
+		sourceColumn: [Min Share]
+
+	column 'Max Share'
+		dataType: double
+		isHidden
+		lineageTag: 1c6f3a95-4e8b-4d27-b1f6-7a2c9e5d3b48
+		summarizeBy: none
+		sourceColumn: [Max Share]
+
+	partition 'Promo Share Band' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Band", STRING, "Band Order", INTEGER, "Min Share", DOUBLE, "Max Share", DOUBLE,
+				    {
+				        {"Under 20%", 1, 0, 0.2},
+				        {"20-60%", 2, 0.2, 0.6},
+				        {"60% and above", 3, 0.6, 1.01}
+				    }
+				)
+

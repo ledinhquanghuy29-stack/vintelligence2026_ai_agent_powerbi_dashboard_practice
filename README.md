@@ -1,6 +1,6 @@
 # Supply Chain & Sales Performance Dashboard
 
-A Power BI dashboard built from scratch on a synthetic e-commerce fashion dataset (13 CSV files, ~2.5M rows, Jul 2012 – Dec 2022). 
+A Power BI dashboard built from scratch on an e-commerce fashion retailer's dataset (13 CSV files, ~2.5M rows, Jul 2012 – Dec 2022). 
 
 **Stack:** Power BI (PBIP/TMDL project format), Power Query, DAX, Python (data profiling)
 
@@ -107,6 +107,6 @@ Power BI with Ai/
 
 ## Known limitations
 
-- The dataset is synthetic: several dimensions (lead time, return rate by category) are statistically flat by construction. The dashboard tracks these honestly rather than inventing a pattern that isn't there.
+- Several dimensions (lead time, return rate by category) barely vary. The dashboard tracks these as stable KPIs rather than inventing a pattern that isn't there.
 - Inventory is a monthly snapshot and covers roughly a third the volume of actual order quantities — it's never compared directly to order-level numbers.
 - Cost is a static catalog value per product, so cost *trends* can't be analyzed from this data; only price and product-mix effects on margin can be.
