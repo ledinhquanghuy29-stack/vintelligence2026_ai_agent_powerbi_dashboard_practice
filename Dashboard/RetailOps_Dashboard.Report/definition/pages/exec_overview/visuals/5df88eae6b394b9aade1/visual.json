@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "5df88eae6b394b9aade1",
+  "position": {
+    "x": 650,
+    "y": 142,
+    "z": 0,
+    "height": 100,
+    "width": 300,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Delivered Within SLA %"
+                }
+              },
+              "queryRef": "_Measures.Delivered Within SLA %",
+              "nativeQueryRef": "Delivered Within SLA %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    }
+  }
+}

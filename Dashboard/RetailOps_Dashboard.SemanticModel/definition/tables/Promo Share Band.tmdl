@@ -36,9 +36,9 @@ table 'Promo Share Band'
 				DATATABLE(
 				    "Band", STRING, "Band Order", INTEGER, "Min Share", DOUBLE, "Max Share", DOUBLE,
 				    {
-				        {"Under 20%", 1, 0, 0.2},
-				        {"20-60%", 2, 0.2, 0.6},
-				        {"60% and above", 3, 0.6, 1.01}
+				        {"Promo <20% of revenue", 1, 0, 0.2},
+				        {"Promo 20-60% of revenue", 2, 0.2, 0.6},
+				        {"Promo ≥60% of revenue", 3, 0.6, 1.01}
 				    }
 				)
 

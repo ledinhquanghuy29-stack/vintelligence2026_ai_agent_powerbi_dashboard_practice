@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "903ec5c9ca2d4eb3b85d",
+  "position": {
+    "x": 1612,
+    "y": 358,
+    "z": 1000,
+    "width": 276,
+    "height": 126,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "0",
+                    "textStyle": {
+                      "fontSize": "30pt",
+                      "fontWeight": "bold",
+                      "color": "#D8674F"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "overlap between reviewed and returned order-product lines",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "fontWeight": "normal",
+                      "color": "#2F3B46"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

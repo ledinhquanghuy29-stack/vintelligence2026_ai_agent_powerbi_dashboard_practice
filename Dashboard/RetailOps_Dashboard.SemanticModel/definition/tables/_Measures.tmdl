@@ -1041,6 +1041,21 @@ table _Measures
 		displayFolder: Sales
 		lineageTag: 6f9a2c84-3e1b-4d75-a8c6-0b4e7d2f9a16
 
+	measure 'Months in Promo Band' =
+			VAR MinS = MIN('Promo Share Band'[Min Share])
+			VAR MaxS = MAX('Promo Share Band'[Max Share])
+			RETURN
+				COUNTROWS(
+					FILTER(
+						VALUES('Date'[Month Start]),
+						VAR s = [Promo Revenue Share %]
+						RETURN NOT ISBLANK(s) && s >= MinS && s < MaxS
+					)
+				)
+		formatString: #,0
+		displayFolder: Sales
+		lineageTag: 4d8b2f61-7a3e-4c95-b1d7-9e6a0c3f5b28
+
 	column Dummy
 		dataType: int64
 		isHidden

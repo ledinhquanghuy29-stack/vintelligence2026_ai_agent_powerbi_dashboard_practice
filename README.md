@@ -53,11 +53,12 @@ customers ──< orders >── geography (zip)
 - **Promotions run at a loss**: lines with a promotion average **−14% gross margin**, vs. **+20%** without. ~27% of all order lines sell below cost.
 - **Gross margin follows a two-year promotion cycle**: odd years run 6 campaigns at ~21% average discount (adding Jan–Mar and Jul–Sep campaigns), even years run 4 at 15%. Odd years end at ~5–7% gross margin, even years at ~11–13%. Margin on non-promoted sales stays near 20% throughout, so the swing comes from the promotion calendar, not from cost or demand.
 - **A margin decline in 2021–2022 traced to product mix, not price or cost**: non-promoted margin slipped from ~20% to 17.4%, and a shift toward lower-margin SKUs explains the drop almost exactly (confirmed with a shift-share decomposition), while list price and unit cost stayed constant.
+- **Service and stock both miss their targets by a wide margin**: only ~75% of orders arrive within the 7-day SLA against a 95% target, and ~58% of product-months are overstocked against a 30% ceiling. Return rate (~4%) is the one operational KPI inside its limit (5%).
 - **Delivery and return rates are flat across every dimension tested** (region, category, size, year) — a useful finding in itself: there's no weak link to chase, so the dashboard tracks these as stable KPIs rather than manufacturing a false trend.
 - **Reviews cover only 17% of orders and 59% of products** — ratings are directional, not a full quality signal.
 - **Web traffic can't be tied to orders**: daily sessions correlate only 0.15 with daily delivered orders and share no join key, so it's kept to a small reference panel rather than a funnel narrative the data can't support.
 
-Full findings, with every supporting number, are in [`Dashboard/DASHBOARD_INSTRUCTION.md`](Dashboard/DASHBOARD_INSTRUCTION.md).
+The data model, every measure definition and the page-by-page design are in [`Dashboard/DASHBOARD_INSTRUCTION.md`](Dashboard/DASHBOARD_INSTRUCTION.md).
 
 ---
 
@@ -65,14 +66,14 @@ Full findings, with every supporting number, are in [`Dashboard/DASHBOARD_INSTRU
 
 | Page | Covers |
 |---|---|
-| **Executive Overview** | Six KPIs, each with a YoY change or vs-target status; monthly revenue, margin and stock trends; category comparison |
-| **Sales and Margin** | Revenue trend, seasonality, product mix, promotion effect, promo-channel breakdown |
-| **Delivery and Returns** | Lead time vs. the 7-day SLA, shipping cost, return reasons and refunds |
-| **Inventory** | Monthly stock snapshot, days of supply, a sorted, filtered list of currently overstocked SKUs |
-| **Customers and Satisfaction** | New vs. repeat customers, acquisition channel, ratings, review coverage, web traffic (reference) |
-| **Data Quality and Definitions** | Reconciliation checks, KPI definitions, data exceptions |
+| **Overview** | Six headline KPIs; monthly revenue; rolling 12-month margin and days of supply; margin and overstock by category. Slicers for year, month, region, category and sales channel |
+| **Sales & Margin** | Revenue and orders by month, seasonality, product mix, margin by promo status, margin by how much of a month's revenue came from promotions, and the two-year promotion cycle by year |
+| **Delivery & Returns** | SLA % and return rate by month against their targets, order status mix, shipping fee groups, refunds by return reason |
+| **Inventory** | Monthly stock and sell-through, days of supply by calendar month, stock value by category, and the overstocked SKUs at the latest snapshot ranked by stock value |
+| **Customers** | Customers by month, revenue by acquisition channel, positive review % by month, rating distribution, web traffic (reference only) |
+| **Data Quality** | Reconciliation against independent totals, known data exceptions, KPI definitions, targets, and which date each page uses |
 
-All six pages share one 1,920×1,300 canvas and one colour theme.
+Every KPI card has a second line: either the change against the year before (green or red depending on whether that direction is good for that KPI) or its status against a target. All six pages share one 1,920×1,300 canvas, a page navigator, and one colour scheme where each colour has a single meaning (navy = actual, amber = promotions, green / red = good / bad, grey dashed = target).
 
 ---
 
@@ -87,6 +88,9 @@ A few judgment calls an analyst has to make before the numbers mean anything —
 | Stockout | `stockout_days` ≥ 3 | At ≥ 1 day the rate hits 67% — too sensitive to be useful |
 | Overstock | `days_of_supply` > 180 | Median days of supply is 240, so this threshold actually separates cases |
 | Currency | All money values shown in $ | The source data states no currency; one unit across the whole report avoids mixing labels. Shipping fee sits on a much smaller scale than prices and is never added to them |
+| KPI targets | SLA ≥ 95%, return rate ≤ 5%, overstock ≤ 30%, stockout ≤ 5% | The data states no targets; these are assumed benchmarks so each KPI can be judged as on or off track |
+| Year-over-year comparison | Latest selected year vs the year before, months present in both years only | Keeps the comparison meaningful at the default "All years" view, and stops 2013 vs 2012 (a half year) from showing inflated growth |
+| Recent orders | Return rate excludes the last 31 days of orders; SLA % the last 10 days | Those orders' return or delivery window hadn't closed when the data ends, which made the final month look artificially good |
 
 ## Repository layout
 
@@ -110,3 +114,5 @@ Power BI with Ai/
 - Several dimensions (lead time, return rate by category) barely vary. The dashboard tracks these as stable KPIs rather than inventing a pattern that isn't there.
 - Inventory is a monthly snapshot and covers roughly a third the volume of actual order quantities — it's never compared directly to order-level numbers.
 - Cost is a static catalog value per product, so cost *trends* can't be analyzed from this data; only price and product-mix effects on margin can be.
+- KPI targets are assumptions, not targets stated in the data.
+- Reviews cover only part of the orders, so rating KPIs are directional.

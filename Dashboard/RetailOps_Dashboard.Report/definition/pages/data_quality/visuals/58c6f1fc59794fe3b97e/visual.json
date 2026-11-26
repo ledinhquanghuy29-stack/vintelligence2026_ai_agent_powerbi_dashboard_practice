@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.3.0/schema.json",
+  "name": "58c6f1fc59794fe3b97e",
+  "position": {
+    "x": 1296,
+    "y": 358,
+    "z": 1000,
+    "width": 276,
+    "height": 126,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "788",
+                    "textStyle": {
+                      "fontSize": "30pt",
+                      "fontWeight": "bold",
+                      "color": "#D8674F"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "products never sold - no inventory rows at all",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "fontWeight": "normal",
+                      "color": "#2F3B46"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
